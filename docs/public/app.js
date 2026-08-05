@@ -40,20 +40,34 @@ async function api(url, options = {}) {
     "Content-Type": "application/json",
     ...(options.headers || {}),
   };
-  if (state.token) headers.Authorization = `Bearer ${state.token}`;
-  const res = await fetch(url, { ...options, headers });
+
+  if (state.token) {
+    headers.Authorization = `Bearer ${state.token}`;
+  }
+
+  const fullUrl = `${API_BASE}${url}`;
+
+  const res = await fetch(fullUrl, {
+    ...options,
+    headers,
+  });
+
   if (res.status === 401) {
     logout(false);
     throw new Error("Session expired");
   }
+
   const data = res.headers.get("content-type")?.includes("application/json")
     ? await res.json()
     : res;
+
   if (!res.ok) {
     const message =
       data && data.message ? data.message : `Request failed (${res.status})`;
+
     throw new Error(message);
   }
+
   return data;
 }
 
@@ -180,8 +194,10 @@ modal.onclick = (e) => {
 
 $("pdfBtn").onclick = async () => {
   try {
-    const res = await fetch("/api/export/pdf", {
-      headers: { Authorization: `Bearer ${state.token}` },
+    const res = await fetch(`${API_BASE}/api/export/pdf`, {
+      headers: {
+        Authorization: `Bearer ${state.token}`,
+      },
     });
     if (!res.ok) throw new Error("Could not create PDF");
     const blob = await res.blob();
