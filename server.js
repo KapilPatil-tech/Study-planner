@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
 const path = require("path");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -10,6 +11,13 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 
 const app = express();
+app.use(
+  cors({
+    origin: "https://kapilpatil-tech.github.io",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
 const PORT = process.env.PORT || 5000;
 const MONGO_URI =
   process.env.MONGO_URI ||
@@ -532,12 +540,10 @@ app.post("/api/:type", auth, async (req, res) => {
   if (!Model) return res.status(404).json({ message: "Invalid resource." });
   try {
     if (mongoose.connection.readyState !== 1)
-      return res
-        .status(503)
-        .json({
-          message:
-            "MongoDB is not connected. Start MongoDB and restart the server.",
-        });
+      return res.status(503).json({
+        message:
+          "MongoDB is not connected. Start MongoDB and restart the server.",
+      });
     const payload = cleanPayload(type, req.body || {});
     const validation = validateResource(type, payload);
     if (validation) return res.status(400).json({ message: validation });
