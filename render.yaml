@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: engineering-study-planner
+    runtime: node
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: ADMIN_SETUP_KEY
+        sync: false
+      - key: NODE_ENV
+        value: production
