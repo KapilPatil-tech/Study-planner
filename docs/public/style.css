@@ -2040,3 +2040,221 @@ on the login and signup screens.
     padding-bottom: 110px;
   }
 }
+
+/* =========================================
+   MOBILE DASHBOARD / CONTENT FIX
+   ========================================= */
+
+@media (max-width: 800px) {
+
+  html,
+  body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .app-shell {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .main {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+  }
+
+  #pageContent {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  /* Dashboard hero */
+  .dashboard-hero {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .dashboard-hero h2 {
+    word-break: break-word;
+  }
+
+  .dashboard-hero p {
+    overflow-wrap: anywhere;
+  }
+
+  /* All cards */
+  .card,
+  .stat-card,
+  .dashboard-panel {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  /* Prevent long text from pushing page width */
+  .item,
+  .notification,
+  .schedule-row,
+  .deadline-row,
+  .subject-progress-row {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .item-main,
+  .item-title,
+  .item-meta,
+  .deadline-info,
+  .schedule-info {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  /* Tables should scroll inside their own container */
+  .table-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .data-table {
+    min-width: 650px;
+  }
+
+  /* Forms */
+  .form-grid,
+  .form-grid-2,
+  .two-col {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  input,
+  select,
+  textarea {
+    max-width: 100%;
+  }
+
+  /* Page headers */
+  .page-head {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Top header */
+  .topbar {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .topbar>div:first-child {
+    min-width: 0;
+  }
+
+  .topbar h1 {
+    overflow-wrap: anywhere;
+  }
+
+  /* Statistics */
+  .stats,
+  .dashboard-stats,
+  .prep-kpis,
+  .analytics-kpis,
+  .goals-kpis,
+  .attendance-kpis {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Quick actions */
+  .quick-grid,
+  .dashboard-quick-grid {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Modal */
+  .modal {
+    padding: 12px;
+  }
+
+  .modal-box {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Buttons don't force horizontal scrolling */
+  .actions {
+    max-width: 100%;
+  }
+
+  .small-btn {
+    max-width: 100%;
+  }
+}
+
+/* Small phones */
+@media (max-width: 520px) {
+
+  .main {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .topbar {
+    gap: 8px;
+  }
+
+  .topbar h1 {
+    font-size: 22px;
+  }
+
+  .dashboard-hero {
+    border-radius: 16px;
+    padding: 17px;
+  }
+
+  .stat-card,
+  .card {
+    padding: 15px;
+    border-radius: 15px;
+  }
+
+  .item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .item .actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .schedule-row {
+    grid-template-columns: 52px 8px minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .deadline-row {
+    min-width: 0;
+  }
+
+  .countdown {
+    flex-shrink: 0;
+  }
+
+  .notification {
+    min-width: 0;
+  }
+
+  .notification p {
+    overflow-wrap: anywhere;
+  }
+}
