@@ -2005,3 +2005,38 @@ on the login and signup screens.
     font-size: 21px;
   }
 }
+
+/* =========================================
+   MOBILE NAVIGATION FIX
+   ========================================= */
+
+@media (max-width: 800px) {
+
+  /* Sidebar always stays above bottom navigation */
+  .sidebar {
+    z-index: 1000;
+  }
+
+  /* Mobile bottom navigation */
+  .bottom-nav {
+    z-index: 900;
+  }
+
+  /* Sidebar menu buttons */
+  .sidebar .nav-item {
+    width: 100%;
+    min-height: 46px;
+  }
+
+  /* Active bottom navigation item */
+  .bottom-nav button.active {
+    color: #ffffff;
+    background: #635bff;
+    border-radius: 12px;
+  }
+
+  /* Keep main content from hiding behind bottom nav */
+  .main {
+    padding-bottom: 110px;
+  }
+}
