@@ -174,8 +174,30 @@ document.querySelectorAll(".nav-item,.bottom-nav button").forEach((btn) => {
   };
 });
 
-$("mobileMenu").onclick = () =>
-  document.querySelector(".sidebar").classList.toggle("open");
+const sidebar = document.querySelector(".sidebar");
+const mobileMenu = $("mobileMenu");
+
+mobileMenu.onclick = (e) => {
+  e.stopPropagation();
+  sidebar.classList.toggle("open");
+};
+
+// Close sidebar when tapping/clicking outside it
+document.addEventListener("click", (e) => {
+  if (
+    window.innerWidth <= 800 &&
+    sidebar.classList.contains("open") &&
+    !sidebar.contains(e.target) &&
+    !mobileMenu.contains(e.target)
+  ) {
+    sidebar.classList.remove("open");
+  }
+});
+
+// Prevent clicks inside sidebar from closing it
+sidebar.addEventListener("click", (e) => {
+  e.stopPropagation();
+});
 
 $("themeBtn").onclick = () => {
   document.body.classList.toggle("dark-mode");

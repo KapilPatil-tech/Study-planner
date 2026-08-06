@@ -1,5 +1,5 @@
-/*root.style*/
-.actions {
+/*docs.style*/
+:root {
   --primary: #635bff;
   --primary2: #8b5cf6;
   --bg: #f5f7fb;
@@ -1617,147 +1617,226 @@ on the login and signup screens.
 
 @media(max-width:800px) {
 
-  /* -------------------------
-     LOGIN / SIGNUP
-  ------------------------- */
+  /* =========================
+     AUTH / LOGIN / SIGNUP
+     ========================= */
 
   .auth-layout {
-    display: block;
     min-height: 100dvh;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
     overflow-x: hidden;
-    padding-bottom: 25px;
   }
 
   .auth-brand {
-    padding: 35px 22px 20px;
+    padding: 35px 22px 15px;
+    min-height: auto;
   }
 
   .auth-brand>span {
-    margin-bottom: 30px;
+    margin: 10px 0 25px;
   }
 
   .auth-brand h1 {
-    font-size: 44px;
+    font-size: 42px;
     letter-spacing: -2px;
   }
 
   .auth-brand p {
-    font-size: 15px;
-    line-height: 1.6;
+    font-size: 14px;
+    margin-top: 15px;
+    line-height: 1.5;
   }
 
   .feature-mini {
-    margin-top: 25px;
-    gap: 9px;
+    display: none;
   }
 
   .auth-card {
-    margin: 20px auto 35px;
-    width: calc(100% - 32px);
+    margin: 15px auto 30px;
+    width: calc(100% - 30px);
+    max-width: 520px;
     padding: 24px;
     border-radius: 22px;
   }
 
-  /* Absolutely hide bottom nav on login/signup */
-  #authView:not(.hidden)~.bottom-nav {
-    display: none !important;
+
+  /* =========================
+     APP LAYOUT
+     ========================= */
+
+  .app-shell {
+    display: flex;
+    min-height: 100dvh;
   }
 
-  /* -------------------------
-     SIDEBAR
-  ------------------------- */
+
+  /* =========================
+     MOBILE SIDEBAR
+     ========================= */
 
   .sidebar {
-    width: 280px;
+    position: fixed;
+
+    top: 0;
+    left: 0;
+    bottom: 0;
+
+    width: min(280px, 85vw);
     height: 100dvh;
+
+    padding: 22px 14px;
+
     transform: translateX(-100%);
     transition: transform .25s ease;
-    box-shadow: 10px 0 35px rgba(0, 0, 0, .25);
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    -webkit-overflow-scrolling: touch;
+
+    z-index: 100;
   }
 
   .sidebar.open {
     transform: translateX(0);
   }
 
-  /*
-    Keep menu scrollable on mobile too.
-  */
-  .sidebar nav {
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
+  /* Sidebar scrollbar */
+
+  .sidebar::-webkit-scrollbar {
+    width: 5px;
   }
 
-  .sidebar-bottom {
+  .sidebar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .sidebar::-webkit-scrollbar-thumb {
+    background: #ffffff30;
+    border-radius: 10px;
+  }
+
+  .sidebar nav {
+    display: grid;
+    gap: 6px;
+  }
+
+  .nav-item {
+    min-height: 46px;
     flex-shrink: 0;
   }
 
-  /* -------------------------
-     MAIN
-  ------------------------- */
+  .sidebar-bottom {
+    margin-top: 25px;
+    padding-bottom: 20px;
+  }
+
+
+  /* =========================
+     MAIN CONTENT
+     ========================= */
 
   .main {
     margin-left: 0;
     width: 100%;
-    padding: 22px 18px 90px;
+    min-width: 0;
+
+    padding: 22px 18px 95px;
+
+    overflow-x: hidden;
   }
+
+
+  /* =========================
+     TOPBAR
+     ========================= */
 
   .topbar {
     align-items: flex-start;
+    margin-bottom: 22px;
+  }
+
+  .mobile-menu {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 0;
+    background: transparent;
+
+    font-size: 22px;
+
+    width: 36px;
+    height: 36px;
+
+    margin-right: 5px;
   }
 
   .top-actions .secondary {
     display: none;
   }
 
-  .mobile-menu {
-    display: inline-block;
-    border: 0;
-    background: transparent;
-    font-size: 20px;
-    margin-right: 7px;
+  .topbar h1 {
+    font-size: 24px;
   }
 
-  /* -------------------------
-     MOBILE BOTTOM NAV
-  ------------------------- */
 
-  /*
-    Bottom navigation ONLY appears after login.
-  */
-  #appView:not(.hidden)~.bottom-nav {
+  /* =========================
+     BOTTOM NAVIGATION
+     ========================= */
+
+  .bottom-nav {
     position: fixed;
+
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    bottom: 12px;
-    left: 12px;
-    right: 12px;
 
-    background: #11152df2;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+
+    background: #11152df5;
+
     border-radius: 18px;
     padding: 9px;
 
-    z-index: 30;
+    z-index: 90;
 
     box-shadow: 0 15px 35px #0003;
+
+    padding-bottom: max(9px, env(safe-area-inset-bottom));
   }
 
-  #appView:not(.hidden)~.bottom-nav button {
+  .bottom-nav button {
     border: 0;
     background: transparent;
     color: #cbd0e1;
     font-size: 18px;
+    min-width: 0;
   }
 
-  #appView:not(.hidden)~.bottom-nav small {
+  .bottom-nav small {
     display: block;
     font-size: 9px;
     margin-top: 4px;
   }
 
-  .topbar h1 {
-    font-size: 24px;
+
+  /* =========================
+     GRID RESPONSIVENESS
+     ========================= */
+
+  .stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-grid {
+    grid-template-columns: 1fr 1fr;
   }
 
   .form-grid {
@@ -1774,10 +1853,17 @@ on the login and signup screens.
 
   .dashboard-hero {
     align-items: flex-start;
+    flex-direction: column;
   }
 
   .dashboard-quick-grid {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .hero-score {
+    width: 100%;
+    min-width: 0;
+    text-align: left;
   }
 
   .planner-hero {
@@ -1788,7 +1874,10 @@ on the login and signup screens.
     display: none;
   }
 
-  .form-grid-2,
+  .form-grid-2 {
+    grid-template-columns: 1fr 1fr;
+  }
+
   .planner-stats {
     grid-template-columns: 1fr 1fr;
   }
@@ -1809,6 +1898,15 @@ on the login and signup screens.
 
   .analytics-row {
     grid-template-columns: 100px 1fr 45px;
+  }
+
+  .notification {
+    grid-template-columns: 36px 1fr;
+  }
+
+  .notification button {
+    grid-column: 2;
+    justify-self: start;
   }
 }
 
@@ -1905,5 +2003,258 @@ on the login and signup screens.
 
   .topbar h1 {
     font-size: 21px;
+  }
+}
+
+/* =========================================
+   MOBILE NAVIGATION FIX
+   ========================================= */
+
+@media (max-width: 800px) {
+
+  /* Sidebar always stays above bottom navigation */
+  .sidebar {
+    z-index: 1000;
+  }
+
+  /* Mobile bottom navigation */
+  .bottom-nav {
+    z-index: 900;
+  }
+
+  /* Sidebar menu buttons */
+  .sidebar .nav-item {
+    width: 100%;
+    min-height: 46px;
+  }
+
+  /* Active bottom navigation item */
+  .bottom-nav button.active {
+    color: #ffffff;
+    background: #635bff;
+    border-radius: 12px;
+  }
+
+  /* Keep main content from hiding behind bottom nav */
+  .main {
+    padding-bottom: 110px;
+  }
+}
+
+/* =========================================
+   MOBILE DASHBOARD / CONTENT FIX
+   ========================================= */
+
+@media (max-width: 800px) {
+
+  html,
+  body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .app-shell {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .main {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+  }
+
+  #pageContent {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  /* Dashboard hero */
+  .dashboard-hero {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .dashboard-hero h2 {
+    word-break: break-word;
+  }
+
+  .dashboard-hero p {
+    overflow-wrap: anywhere;
+  }
+
+  /* All cards */
+  .card,
+  .stat-card,
+  .dashboard-panel {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  /* Prevent long text from pushing page width */
+  .item,
+  .notification,
+  .schedule-row,
+  .deadline-row,
+  .subject-progress-row {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .item-main,
+  .item-title,
+  .item-meta,
+  .deadline-info,
+  .schedule-info {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  /* Tables should scroll inside their own container */
+  .table-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .data-table {
+    min-width: 650px;
+  }
+
+  /* Forms */
+  .form-grid,
+  .form-grid-2,
+  .two-col {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  input,
+  select,
+  textarea {
+    max-width: 100%;
+  }
+
+  /* Page headers */
+  .page-head {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Top header */
+  .topbar {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .topbar>div:first-child {
+    min-width: 0;
+  }
+
+  .topbar h1 {
+    overflow-wrap: anywhere;
+  }
+
+  /* Statistics */
+  .stats,
+  .dashboard-stats,
+  .prep-kpis,
+  .analytics-kpis,
+  .goals-kpis,
+  .attendance-kpis {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Quick actions */
+  .quick-grid,
+  .dashboard-quick-grid {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Modal */
+  .modal {
+    padding: 12px;
+  }
+
+  .modal-box {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Buttons don't force horizontal scrolling */
+  .actions {
+    max-width: 100%;
+  }
+
+  .small-btn {
+    max-width: 100%;
+  }
+}
+
+/* Small phones */
+@media (max-width: 520px) {
+
+  .main {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .topbar {
+    gap: 8px;
+  }
+
+  .topbar h1 {
+    font-size: 22px;
+  }
+
+  .dashboard-hero {
+    border-radius: 16px;
+    padding: 17px;
+  }
+
+  .stat-card,
+  .card {
+    padding: 15px;
+    border-radius: 15px;
+  }
+
+  .item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .item .actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .schedule-row {
+    grid-template-columns: 52px 8px minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .deadline-row {
+    min-width: 0;
+  }
+
+  .countdown {
+    flex-shrink: 0;
+  }
+
+  .notification {
+    min-width: 0;
+  }
+
+  .notification p {
+    overflow-wrap: anywhere;
   }
 }
