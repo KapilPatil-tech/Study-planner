@@ -1,3 +1,4 @@
+/*docs.app*/
 const API_BASE = "https://study-planner-7e91.onrender.com";
 const state = {
   token: localStorage.getItem("esp_token"),
