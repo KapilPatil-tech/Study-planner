@@ -2276,3 +2276,171 @@ button:active {
     overflow-wrap: anywhere;
   }
 }
+
+
+/* =========================================================
+   NEW FEATURES: CALENDAR, TIMER, AI ASSISTANT, ADMIN EXPANDED
+========================================================= */
+
+/* Calendar */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.calendar-day-header {
+  text-align: center;
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--muted);
+  padding-bottom: 10px;
+}
+
+.calendar-day {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  min-height: 100px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.calendar-day.today {
+  border-color: var(--primary);
+  background: var(--soft);
+}
+
+.calendar-date {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.cal-event {
+  font-size: 10px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+}
+
+.cal-event.exam {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.cal-event.assignment {
+  background: #eef2ff;
+  color: var(--primary);
+}
+
+/* Pomodoro Timer */
+.timer-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.timer-display {
+  font-size: 80px;
+  font-weight: 800;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  margin: 20px 0;
+  letter-spacing: -2px;
+}
+
+.timer-controls {
+  display: flex;
+  gap: 15px;
+}
+
+.timer-mode {
+  display: flex;
+  gap: 10px;
+  background: var(--soft);
+  padding: 5px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.timer-mode button {
+  background: transparent;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  color: var(--muted);
+}
+
+.timer-mode button.active {
+  background: var(--card);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+/* AI Assistant Chat */
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 600px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--card);
+  overflow: hidden;
+}
+
+.chat-history {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.chat-bubble {
+  max-width: 80%;
+  padding: 12px 16px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.chat-bubble.user {
+  align-self: flex-end;
+  background: var(--primary);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+
+.chat-bubble.ai {
+  align-self: flex-start;
+  background: var(--soft);
+  color: var(--text);
+  border-bottom-left-radius: 4px;
+}
+
+.chat-input-area {
+  display: flex;
+  gap: 10px;
+  padding: 15px;
+  border-top: 1px solid var(--line);
+  background: #fff;
+}
+
+.chat-input-area input {
+  margin: 0;
+  flex: 1;
+}
+
+.dark-mode .chat-input-area {
+  background: var(--card);
+}
