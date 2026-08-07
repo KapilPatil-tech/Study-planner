@@ -162,28 +162,45 @@ function logout(show = true) {
 
 $("logoutBtn").onclick = () => logout(true);
 
-document.querySelectorAll(".nav-item,.bottom-nav button").forEach((btn) => {
+/* =========================================================
+   NAVIGATION & SIDEBAR LOGIC (UPDATED)
+========================================================= */
+
+// Select BOTH sidebar items and bottom nav buttons
+document.querySelectorAll(".nav-item, .bottom-nav button").forEach((btn) => {
   btn.onclick = () => {
+    // Set the current page state based on the button clicked
     state.page = btn.dataset.page;
+
+    // Loop through ALL navigation elements again to update their active state
     document
-      .querySelectorAll(".nav-item")
+      .querySelectorAll(".nav-item, .bottom-nav button")
       .forEach((n) =>
         n.classList.toggle("active", n.dataset.page === state.page),
       );
-    document.querySelector(".sidebar").classList.remove("open");
+
+    // Close the sidebar automatically when ANY link is clicked
+    const sidebar = document.querySelector(".sidebar");
+    if (sidebar) {
+      sidebar.classList.remove("open");
+    }
+
+    // Re-render the page content
     render();
   };
 });
 
+// Selectors for mobile menu toggle
 const sidebar = document.querySelector(".sidebar");
 const mobileMenu = $("mobileMenu");
 
+// Toggle sidebar on mobile menu icon click
 mobileMenu.onclick = (e) => {
   e.stopPropagation();
   sidebar.classList.toggle("open");
 };
 
-// Close sidebar when tapping/clicking outside it
+// Close sidebar when tapping/clicking OUTSIDE it
 document.addEventListener("click", (e) => {
   if (
     window.innerWidth <= 800 &&
@@ -193,6 +210,13 @@ document.addEventListener("click", (e) => {
   ) {
     sidebar.classList.remove("open");
   }
+});
+
+// Close sidebar when a bottom action (like dark mode or logout) is clicked
+document.querySelectorAll(".sidebar-bottom button").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    sidebar.classList.remove("open");
+  });
 });
 
 // Prevent clicks inside sidebar from closing it
