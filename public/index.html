@@ -1,5 +1,5 @@
-<!-- pulic.html -->
-<!DOCTYPE html>
+<!-- root.html -->
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -66,14 +66,17 @@
       </div>
       <nav id="sideNav">
         <button class="nav-item active" data-page="dashboard">⌂ <span>Dashboard</span></button>
+        <button class="nav-item" data-page="calendar">📅 <span>Calendar</span></button>
         <button class="nav-item" data-page="subjects">📚 <span>Subjects</span></button>
         <button class="nav-item" data-page="assignments">✓ <span>Assignments</span></button>
         <button class="nav-item" data-page="exams">🗓 <span>Exams</span></button>
         <button class="nav-item" data-page="timetable">⏱ <span>Timetable</span></button>
         <button class="nav-item" data-page="notes">📝 <span>Notes</span></button>
         <button class="nav-item" data-page="attendance">📊 <span>Attendance</span></button>
-<button class="nav-item" data-page="attendance-intelligence">🎯 <span>Attendance Intelligence</span></button>
+        <button class="nav-item" data-page="attendance-intelligence">🎯 <span>Attendance Intel</span></button>
         <button class="nav-item" data-page="planner">🤖 <span>Smart Planner</span></button>
+        <button class="nav-item" data-page="timer">⏳ <span>Focus Timer</span></button>
+        <button class="nav-item" data-page="assistant">🧠 <span>AI Assistant</span></button>
         <button class="nav-item" data-page="exam-prep">📝 <span>Exam Prep</span></button>
         <button class="nav-item" data-page="analytics">📈 <span>Analytics</span></button>
         <button class="nav-item" data-page="notifications">🔔 <span>Notifications</span></button>
@@ -118,6 +121,943 @@
     <button data-page="assignments">✓<small>Tasks</small></button>
     <button data-page="exams">🗓<small>Exams</small></button>
     <button data-page="exam-prep">📝<small>Prep</small></button>
+    <button data-page="profile">⚙<small>Profile</small></button>
+  </nav>
+
+  <script src="app.js"></script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Engineering Study Planner Pro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="toast"></div>
+
+  <!-- AUTHENTICATION VIEW -->
+  <section id="authView" class="auth-layout">
+    <div class="auth-brand">
+      <div class="brand-header">
+        <div class="brand-mark">EP</div>
+        <div class="brand-text">
+          <strong>Engineering Planner</strong>
+          <span class="pro-tag">PRO</span>
+        </div>
+      </div>
+      
+      <div class="brand-hero-content">
+        <div class="eyebrow-light">STUDENT COMMAND CENTER</div>
+        <h1>Plan smarter.<br><span>Study better.</span></h1>
+        <p>A polished academic workspace for subjects, deadlines, exams, attendance, planning and performance.</p>
+        
+        <div class="feature-checks">
+          <div class="feature-card">
+            <span class="check-icon">✓</span>
+            <div>
+              <strong>Academic control</strong>
+              <small>subjects, assignments, exams & timetable</small>
+            </div>
+          </div>
+          <div class="feature-card">
+            <span class="check-icon">✓</span>
+            <div>
+              <strong>Smart productivity</strong>
+              <small>planner, goals, streaks & focus tools</small>
+            </div>
+          </div>
+          <div class="feature-card">
+            <span class="check-icon">✓</span>
+            <div>
+              <strong>Performance intelligence</strong>
+              <small>attendance, analytics & academic reports</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-footer-credit">
+        Engineering Study Planner Pro • Created by Patil Kapil
+      </div>
+    </div>
+
+    <div class="auth-card-container">
+      <div class="auth-card">
+        <div class="security-badge">
+          <span class="dot"></span> Secure workspace
+        </div>
+
+        <div class="auth-tabs">
+          <button class="active" data-auth="login">Login</button>
+          <button data-auth="signup">Create account</button>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <form id="loginForm">
+          <h2>Welcome back 👋</h2>
+          <p class="muted">Continue managing your semester.</p>
+          <label>Email<input id="loginEmail" type="email" required placeholder="you@example.com"></label>
+          <label>Password<input id="loginPassword" type="password" required placeholder="••••••••"></label>
+          <button class="primary full" type="submit">Login to planner →</button>
+          <p class="form-footnote">Your academic data is isolated to your account.</p>
+        </form>
+
+        <!-- SIGNUP FORM -->
+        <form id="signupForm" class="hidden">
+          <h2>Create your account</h2>
+          <p class="muted">Set up your academic command center.</p>
+          <div class="two-col">
+            <label>Name<input id="signupName" required placeholder="Full name"></label>
+            <label>Roll No.<input id="signupRoll" placeholder="Roll number"></label>
+          </div>
+          <label>Email<input id="signupEmail" type="email" required placeholder="you@example.com"></label>
+          <label>Password<input id="signupPassword" type="password" required minlength="6" placeholder="Minimum 6 characters"></label>
+          <label>College<input id="signupCollege" placeholder="College name"></label>
+          <div class="two-col">
+            <label>Branch<input id="signupBranch" placeholder="Computer / IT / EC"></label>
+            <label>Semester<input id="signupSemester" placeholder="6"></label>
+          </div>
+          <button class="primary full" type="submit">Create student account →</button>
+          <p class="form-footnote">Your academic data is isolated to your account.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- APP MAIN SHELL -->
+  <section id="appView" class="app-shell hidden">
+    <!-- MAIN SIDEBAR -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">EP</div>
+        <div>
+          <strong>Engineering</strong>
+          <small>Study Planner <span>PRO</span></small>
+        </div>
+      </div>
+      
+      <div class="sidebar-creator">Created by Patil Kapil</div>
+
+      <nav id="sideNav">
+        <div class="nav-section-label">WORKSPACE</div>
+        <button class="nav-item active" data-page="dashboard">⌂ <span>Dashboard</span></button>
+        <button class="nav-item" data-page="subjects">📚 <span>Subjects</span></button>
+        <button class="nav-item" data-page="assignments">✓ <span>Assignments</span></button>
+        <button class="nav-item" data-page="exams">🗓 <span>Exams</span></button>
+        <button class="nav-item" data-page="timetable">⏱ <span>Timetable</span></button>
+        <button class="nav-item" data-page="notes">📝 <span>Notes</span></button>
+        <button class="nav-item" data-page="attendance">📊 <span>Attendance</span></button>
+        <button class="nav-item" data-page="attendance-intelligence">🎯 <span>Attendance Intelligence</span></button>
+
+        <div class="nav-section-label">SMART TOOLS</div>
+        <button class="nav-item" data-page="planner">🤖 <span>Smart Planner</span></button>
+        <button class="nav-item" data-page="exam-prep">📝 <span>Exam Prep</span></button>
+
+        <div class="nav-section-label">ANALYTICS</div>
+        <button class="nav-item" data-page="notifications">🔔 <span>Notifications</span></button>
+        <button class="nav-item" data-page="goals">🎯 <span>Goals & Streak</span></button>
+
+        <div class="nav-section-label">ACCOUNT</div>
+        <button class="nav-item" data-page="profile">⚙ <span>Profile & Security</span></button>
+        <button class="nav-item admin-only hidden" data-page="admin">🛡 <span>Admin Panel</span></button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="theme-control">
+          <span>Theme</span>
+          <button id="themeBtn" class="theme-toggle-pill">
+            <span class="light-label">Light</span>
+            <span class="dark-label">Dark</span>
+          </button>
+        </div>
+        <button id="logoutBtn" class="logout">↪ Logout</button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT VIEW -->
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button id="mobileMenu" class="mobile-menu">☰</button>
+          <div>
+            <div class="eyebrow" id="pageEyebrow">OVERVIEW</div>
+            <h1 id="pageTitle">Dashboard <span id="topbarClock" class="clock-display">01:21 AM</span></h1>
+          </div>
+        </div>
+        <div class="top-actions">
+          <button id="timerModalBtn" class="icon-btn" title="Focus Session Timer">⏱️</button>
+          <button id="searchBtn" class="icon-btn" title="Search">🔍</button>
+          <button id="topThemeBtn" class="icon-btn" title="Toggle Theme">☀️</button>
+          <button id="backupBtn" class="secondary">⇩ Backup JSON</button>
+          <button id="pdfBtn" class="primary">⇩ PDF Report</button>
+          <div class="avatar" id="avatar">P</div>
+        </div>
+      </header>
+
+      <div id="pageContent"></div>
+    </main>
+  </section>
+
+  <!-- FOCUS SESSION MODAL -->
+  <div id="focusModal" class="modal hidden">
+    <div class="modal-box focus-modal-box">
+      <button class="modal-close" id="focusModalClose">×</button>
+      <div class="focus-modal-content">
+        <div class="eyebrow">DEEP WORK MODE</div>
+        <h2>Focus session</h2>
+        <p class="muted">Put your phone away. One task. Full attention.</p>
+
+        <div class="timer-display-circle">
+          <span id="focusDisplay">25:00</span>
+          <small id="focusStateLabel">FOCUS</small>
+        </div>
+
+        <div class="timer-presets">
+          <button class="preset-btn active" data-time="25">25 min</button>
+          <button class="preset-btn" data-time="50">50 min</button>
+          <button class="preset-btn" data-time="90">90 min</button>
+        </div>
+
+        <div class="focus-actions">
+          <button id="resetFocusBtn" class="secondary">Reset</button>
+          <button id="startFocusBtn" class="primary">Start focus</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STANDARD EDIT / ADD MODAL -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-box">
+      <button class="modal-close" id="modalClose">×</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAVIGATION FOR MOBILE -->
+  <nav class="bottom-nav" id="bottomNav">
+    <button data-page="dashboard">⌂<small>Home</small></button>
+    <button data-page="subjects">📚<small>Subjects</small></button>
+    <button data-page="assignments">✓<small>Tasks</small></button>
+    <button data-page="exams">🗓<small>Exams</small></button>
+    <button data-page="planner">🤖<small>Planner</small></button>
+    <button data-page="profile">⚙<small>Profile</small></button>
+  </nav>
+
+  <script src="app.js"></script>
+</body>
+</html><!-- root.html -->
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Engineering Study Planner Pro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="toast"></div>
+
+  <section id="authView" class="auth-layout">
+    <div class="auth-brand">
+      <div class="brand-mark">EP</div>
+      <span>Engineering Planner</span>
+      <h1>Plan smarter.<br><span>Study better.</span></h1>
+      <p>A complete academic command center for engineering students.</p>
+      <div class="feature-mini">
+        <span>✓</span> Subjects, assignments & exams
+        <span>✓</span> Attendance & analytics
+        <span>✓</span> PDF academic reports
+      </div>
+    </div>
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <button class="active" data-auth="login">Login</button>
+        <button data-auth="signup">Create account</button>
+      </div>
+
+      <form id="loginForm">
+        <h2>Welcome back 👋</h2>
+        <p class="muted">Continue managing your semester.</p>
+        <label>Email<input id="loginEmail" type="email" required placeholder="you@example.com"></label>
+        <label>Password<input id="loginPassword" type="password" required placeholder="••••••••"></label>
+        <button class="primary full" type="submit">Login</button>
+      </form>
+
+      <form id="signupForm" class="hidden">
+        <h2>Create your student account</h2>
+        <p class="muted">Your data stays separated by your account.</p>
+        <div class="two-col">
+          <label>Name<input id="signupName" required placeholder="Full name"></label>
+          <label>Roll No.<input id="signupRoll" placeholder="Roll number"></label>
+        </div>
+        <label>Email<input id="signupEmail" type="email" required placeholder="you@example.com"></label>
+        <label>Password<input id="signupPassword" type="password" required minlength="6" placeholder="Minimum 6 characters"></label>
+        <label>College<input id="signupCollege" placeholder="College name"></label>
+        <div class="two-col">
+          <label>Branch<input id="signupBranch" placeholder="Computer / IT / EC"></label>
+          <label>Semester<input id="signupSemester" placeholder="6"></label>
+        </div>
+        <button class="primary full" type="submit">Create account</button>
+      </form>
+    </div>
+  </section>
+
+  <section id="appView" class="app-shell hidden">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">EP</div>
+        <div><strong>Engineering</strong><small>Study Planner</small></div>
+      </div>
+      <nav id="sideNav">
+        <button class="nav-item active" data-page="dashboard">⌂ <span>Dashboard</span></button>
+        <button class="nav-item" data-page="calendar">📅 <span>Calendar</span></button>
+        <button class="nav-item" data-page="subjects">📚 <span>Subjects</span></button>
+        <button class="nav-item" data-page="assignments">✓ <span>Assignments</span></button>
+        <button class="nav-item" data-page="exams">🗓 <span>Exams</span></button>
+        <button class="nav-item" data-page="timetable">⏱ <span>Timetable</span></button>
+        <button class="nav-item" data-page="notes">📝 <span>Notes</span></button>
+        <button class="nav-item" data-page="attendance">📊 <span>Attendance</span></button>
+        <button class="nav-item" data-page="attendance-intelligence">🎯 <span>Attendance Intel</span></button>
+        <button class="nav-item" data-page="planner">🤖 <span>Smart Planner</span></button>
+        <button class="nav-item" data-page="timer">⏳ <span>Focus Timer</span></button>
+        <button class="nav-item" data-page="assistant">🧠 <span>AI Assistant</span></button>
+        <button class="nav-item" data-page="exam-prep">📝 <span>Exam Prep</span></button>
+        <button class="nav-item" data-page="analytics">📈 <span>Analytics</span></button>
+        <button class="nav-item" data-page="notifications">🔔 <span>Notifications</span></button>
+        <button class="nav-item" data-page="goals">🎯 <span>Goals & Streak</span></button>
+        <button class="nav-item" data-page="profile">⚙ <span>Profile</span></button>
+        <button class="nav-item admin-only" data-page="admin">🛡 <span>Admin Panel</span></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <button id="themeBtn" class="ghost-btn">🌙 Dark mode</button>
+        <button id="logoutBtn" class="logout">↪ Logout</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <button id="mobileMenu" class="mobile-menu">☰</button>
+          <div class="eyebrow" id="pageEyebrow">OVERVIEW</div>
+          <h1 id="pageTitle">Dashboard</h1>
+        </div>
+        <div class="top-actions">
+          <button id="backupBtn" class="secondary">⇩ Backup JSON</button>
+          <button id="pdfBtn" class="primary">⇩ Download PDF</button>
+          <div class="avatar" id="avatar">S</div>
+        </div>
+      </header>
+
+      <div id="pageContent"></div>
+    </main>
+  </section>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-box">
+      <button class="modal-close" id="modalClose">×</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav" id="bottomNav">
+    <button data-page="dashboard">⌂<small>Home</small></button>
+    <button data-page="subjects">📚<small>Subjects</small></button>
+    <button data-page="assignments">✓<small>Tasks</small></button>
+    <button data-page="exams">🗓<small>Exams</small></button>
+    <button data-page="exam-prep">📝<small>Prep</small></button>
+    <button data-page="profile">⚙<small>Profile</small></button>
+  </nav>
+
+  <script src="app.js"></script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Engineering Study Planner Pro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="toast"></div>
+
+  <!-- AUTHENTICATION VIEW -->
+  <section id="authView" class="auth-layout">
+    <div class="auth-brand">
+      <div class="brand-header">
+        <div class="brand-mark">EP</div>
+        <div class="brand-text">
+          <strong>Engineering Planner</strong>
+          <span class="pro-tag">PRO</span>
+        </div>
+      </div>
+      
+      <div class="brand-hero-content">
+        <div class="eyebrow-light">STUDENT COMMAND CENTER</div>
+        <h1>Plan smarter.<br><span>Study better.</span></h1>
+        <p>A polished academic workspace for subjects, deadlines, exams, attendance, planning and performance.</p>
+        
+        <div class="feature-checks">
+          <div class="feature-card">
+            <span class="check-icon">✓</span>
+            <div>
+              <strong>Academic control</strong>
+              <small>subjects, assignments, exams & timetable</small>
+            </div>
+          </div>
+          <div class="feature-card">
+            <span class="check-icon">✓</span>
+            <div>
+              <strong>Smart productivity</strong>
+              <small>planner, goals, streaks & focus tools</small>
+            </div>
+          </div>
+          <div class="feature-card">
+            <span class="check-icon">✓</span>
+            <div>
+              <strong>Performance intelligence</strong>
+              <small>attendance, analytics & academic reports</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-footer-credit">
+        Engineering Study Planner Pro • Created by Patil Kapil
+      </div>
+    </div>
+
+    <div class="auth-card-container">
+      <div class="auth-card">
+        <div class="security-badge">
+          <span class="dot"></span> Secure workspace
+        </div>
+
+        <div class="auth-tabs">
+          <button class="active" data-auth="login">Login</button>
+          <button data-auth="signup">Create account</button>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <form id="loginForm">
+          <h2>Welcome back 👋</h2>
+          <p class="muted">Continue managing your semester.</p>
+          <label>Email<input id="loginEmail" type="email" required placeholder="you@example.com"></label>
+          <label>Password<input id="loginPassword" type="password" required placeholder="••••••••"></label>
+          <button class="primary full" type="submit">Login to planner →</button>
+          <p class="form-footnote">Your academic data is isolated to your account.</p>
+        </form>
+
+        <!-- SIGNUP FORM -->
+        <form id="signupForm" class="hidden">
+          <h2>Create your account</h2>
+          <p class="muted">Set up your academic command center.</p>
+          <div class="two-col">
+            <label>Name<input id="signupName" required placeholder="Full name"></label>
+            <label>Roll No.<input id="signupRoll" placeholder="Roll number"></label>
+          </div>
+          <label>Email<input id="signupEmail" type="email" required placeholder="you@example.com"></label>
+          <label>Password<input id="signupPassword" type="password" required minlength="6" placeholder="Minimum 6 characters"></label>
+          <label>College<input id="signupCollege" placeholder="College name"></label>
+          <div class="two-col">
+            <label>Branch<input id="signupBranch" placeholder="Computer / IT / EC"></label>
+            <label>Semester<input id="signupSemester" placeholder="6"></label>
+          </div>
+          <button class="primary full" type="submit">Create student account →</button>
+          <p class="form-footnote">Your academic data is isolated to your account.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- APP MAIN SHELL -->
+  <section id="appView" class="app-shell hidden">
+    <!-- MAIN SIDEBAR -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">EP</div>
+        <div>
+          <strong>Engineering</strong>
+          <small>Study Planner <span>PRO</span></small>
+        </div>
+      </div>
+      
+      <div class="sidebar-creator">Created by Patil Kapil</div>
+
+      <nav id="sideNav">
+        <div class="nav-section-label">WORKSPACE</div>
+        <button class="nav-item active" data-page="dashboard">⌂ <span>Dashboard</span></button>
+        <button class="nav-item" data-page="subjects">📚 <span>Subjects</span></button>
+        <button class="nav-item" data-page="assignments">✓ <span>Assignments</span></button>
+        <button class="nav-item" data-page="exams">🗓 <span>Exams</span></button>
+        <button class="nav-item" data-page="timetable">⏱ <span>Timetable</span></button>
+        <button class="nav-item" data-page="notes">📝 <span>Notes</span></button>
+        <button class="nav-item" data-page="attendance">📊 <span>Attendance</span></button>
+        <button class="nav-item" data-page="attendance-intelligence">🎯 <span>Attendance Intelligence</span></button>
+
+        <div class="nav-section-label">SMART TOOLS</div>
+        <button class="nav-item" data-page="planner">🤖 <span>Smart Planner</span></button>
+        <button class="nav-item" data-page="exam-prep">📝 <span>Exam Prep</span></button>
+
+        <div class="nav-section-label">ANALYTICS</div>
+        <button class="nav-item" data-page="notifications">🔔 <span>Notifications</span></button>
+        <button class="nav-item" data-page="goals">🎯 <span>Goals & Streak</span></button>
+
+        <div class="nav-section-label">ACCOUNT</div>
+        <button class="nav-item" data-page="profile">⚙ <span>Profile & Security</span></button>
+        <button class="nav-item admin-only hidden" data-page="admin">🛡 <span>Admin Panel</span></button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="theme-control">
+          <span>Theme</span>
+          <button id="themeBtn" class="theme-toggle-pill">
+            <span class="light-label">Light</span>
+            <span class="dark-label">Dark</span>
+          </button>
+        </div>
+        <button id="logoutBtn" class="logout">↪ Logout</button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT VIEW -->
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button id="mobileMenu" class="mobile-menu">☰</button>
+          <div>
+            <div class="eyebrow" id="pageEyebrow">OVERVIEW</div>
+            <h1 id="pageTitle">Dashboard <span id="topbarClock" class="clock-display">01:21 AM</span></h1>
+          </div>
+        </div>
+        <div class="top-actions">
+          <button id="timerModalBtn" class="icon-btn" title="Focus Session Timer">⏱️</button>
+          <button id="searchBtn" class="icon-btn" title="Search">🔍</button>
+          <button id="topThemeBtn" class="icon-btn" title="Toggle Theme">☀️</button>
+          <button id="backupBtn" class="secondary">⇩ Backup JSON</button>
+          <button id="pdfBtn" class="primary">⇩ PDF Report</button>
+          <div class="avatar" id="avatar">P</div>
+        </div>
+      </header>
+
+      <div id="pageContent"></div>
+    </main>
+  </section>
+
+  <!-- FOCUS SESSION MODAL -->
+  <div id="focusModal" class="modal hidden">
+    <div class="modal-box focus-modal-box">
+      <button class="modal-close" id="focusModalClose">×</button>
+      <div class="focus-modal-content">
+        <div class="eyebrow">DEEP WORK MODE</div>
+        <h2>Focus session</h2>
+        <p class="muted">Put your phone away. One task. Full attention.</p>
+
+        <div class="timer-display-circle">
+          <span id="focusDisplay">25:00</span>
+          <small id="focusStateLabel">FOCUS</small>
+        </div>
+
+        <div class="timer-presets">
+          <button class="preset-btn active" data-time="25">25 min</button>
+          <button class="preset-btn" data-time="50">50 min</button>
+          <button class="preset-btn" data-time="90">90 min</button>
+        </div>
+
+        <div class="focus-actions">
+          <button id="resetFocusBtn" class="secondary">Reset</button>
+          <button id="startFocusBtn" class="primary">Start focus</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STANDARD EDIT / ADD MODAL -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-box">
+      <button class="modal-close" id="modalClose">×</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAVIGATION FOR MOBILE -->
+  <nav class="bottom-nav" id="bottomNav">
+    <button data-page="dashboard">⌂<small>Home</small></button>
+    <button data-page="subjects">📚<small>Subjects</small></button>
+    <button data-page="assignments">✓<small>Tasks</small></button>
+    <button data-page="exams">🗓<small>Exams</small></button>
+    <button data-page="planner">🤖<small>Planner</small></button>
+    <button data-page="profile">⚙<small>Profile</small></button>
+  </nav>
+
+  <script src="app.js"></script>
+</body>
+</html><!-- root.html -->
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Engineering Study Planner Pro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="toast"></div>
+
+  <section id="authView" class="auth-layout">
+    <div class="auth-brand">
+      <div class="brand-mark">EP</div>
+      <span>Engineering Planner</span>
+      <h1>Plan smarter.<br><span>Study better.</span></h1>
+      <p>A complete academic command center for engineering students.</p>
+      <div class="feature-mini">
+        <span>✓</span> Subjects, assignments & exams
+        <span>✓</span> Attendance & analytics
+        <span>✓</span> PDF academic reports
+      </div>
+    </div>
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <button class="active" data-auth="login">Login</button>
+        <button data-auth="signup">Create account</button>
+      </div>
+
+      <form id="loginForm">
+        <h2>Welcome back 👋</h2>
+        <p class="muted">Continue managing your semester.</p>
+        <label>Email<input id="loginEmail" type="email" required placeholder="you@example.com"></label>
+        <label>Password<input id="loginPassword" type="password" required placeholder="••••••••"></label>
+        <button class="primary full" type="submit">Login</button>
+      </form>
+
+      <form id="signupForm" class="hidden">
+        <h2>Create your student account</h2>
+        <p class="muted">Your data stays separated by your account.</p>
+        <div class="two-col">
+          <label>Name<input id="signupName" required placeholder="Full name"></label>
+          <label>Roll No.<input id="signupRoll" placeholder="Roll number"></label>
+        </div>
+        <label>Email<input id="signupEmail" type="email" required placeholder="you@example.com"></label>
+        <label>Password<input id="signupPassword" type="password" required minlength="6" placeholder="Minimum 6 characters"></label>
+        <label>College<input id="signupCollege" placeholder="College name"></label>
+        <div class="two-col">
+          <label>Branch<input id="signupBranch" placeholder="Computer / IT / EC"></label>
+          <label>Semester<input id="signupSemester" placeholder="6"></label>
+        </div>
+        <button class="primary full" type="submit">Create account</button>
+      </form>
+    </div>
+  </section>
+
+  <section id="appView" class="app-shell hidden">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">EP</div>
+        <div><strong>Engineering</strong><small>Study Planner</small></div>
+      </div>
+      <nav id="sideNav">
+        <button class="nav-item active" data-page="dashboard">⌂ <span>Dashboard</span></button>
+        <button class="nav-item" data-page="calendar">📅 <span>Calendar</span></button>
+        <button class="nav-item" data-page="subjects">📚 <span>Subjects</span></button>
+        <button class="nav-item" data-page="assignments">✓ <span>Assignments</span></button>
+        <button class="nav-item" data-page="exams">🗓 <span>Exams</span></button>
+        <button class="nav-item" data-page="timetable">⏱ <span>Timetable</span></button>
+        <button class="nav-item" data-page="notes">📝 <span>Notes</span></button>
+        <button class="nav-item" data-page="attendance">📊 <span>Attendance</span></button>
+        <button class="nav-item" data-page="attendance-intelligence">🎯 <span>Attendance Intel</span></button>
+        <button class="nav-item" data-page="planner">🤖 <span>Smart Planner</span></button>
+        <button class="nav-item" data-page="timer">⏳ <span>Focus Timer</span></button>
+        <button class="nav-item" data-page="assistant">🧠 <span>AI Assistant</span></button>
+        <button class="nav-item" data-page="exam-prep">📝 <span>Exam Prep</span></button>
+        <button class="nav-item" data-page="analytics">📈 <span>Analytics</span></button>
+        <button class="nav-item" data-page="notifications">🔔 <span>Notifications</span></button>
+        <button class="nav-item" data-page="goals">🎯 <span>Goals & Streak</span></button>
+        <button class="nav-item" data-page="profile">⚙ <span>Profile</span></button>
+        <button class="nav-item admin-only" data-page="admin">🛡 <span>Admin Panel</span></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <button id="themeBtn" class="ghost-btn">🌙 Dark mode</button>
+        <button id="logoutBtn" class="logout">↪ Logout</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <button id="mobileMenu" class="mobile-menu">☰</button>
+          <div class="eyebrow" id="pageEyebrow">OVERVIEW</div>
+          <h1 id="pageTitle">Dashboard</h1>
+        </div>
+        <div class="top-actions">
+          <button id="backupBtn" class="secondary">⇩ Backup JSON</button>
+          <button id="pdfBtn" class="primary">⇩ Download PDF</button>
+          <div class="avatar" id="avatar">S</div>
+        </div>
+      </header>
+
+      <div id="pageContent"></div>
+    </main>
+  </section>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-box">
+      <button class="modal-close" id="modalClose">×</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav" id="bottomNav">
+    <button data-page="dashboard">⌂<small>Home</small></button>
+    <button data-page="subjects">📚<small>Subjects</small></button>
+    <button data-page="assignments">✓<small>Tasks</small></button>
+    <button data-page="exams">🗓<small>Exams</small></button>
+    <button data-page="exam-prep">📝<small>Prep</small></button>
+    <button data-page="profile">⚙<small>Profile</small></button>
+  </nav>
+
+  <script src="app.js"></script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Engineering Study Planner Pro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="toast"></div>
+
+  <!-- AUTHENTICATION VIEW -->
+  <section id="authView" class="auth-layout">
+    <div class="auth-brand">
+      <div class="brand-header">
+        <div class="brand-mark">EP</div>
+        <div class="brand-text">
+          <strong>Engineering Planner</strong>
+          <span class="pro-tag">PRO</span>
+        </div>
+      </div>
+      
+      <div class="brand-hero-content">
+        <div class="eyebrow-light">STUDENT COMMAND CENTER</div>
+        <h1>Plan smarter.<br><span>Study better.</span></h1>
+        <p>A polished academic workspace for subjects, deadlines, exams, attendance, planning and performance.</p>
+        
+        <div class="feature-checks">
+          <div class="feature-card">
+            <span class="check-icon">✓</span>
+            <div>
+              <strong>Academic control</strong>
+              <small>subjects, assignments, exams & timetable</small>
+            </div>
+          </div>
+          <div class="feature-card">
+            <span class="check-icon">✓</span>
+            <div>
+              <strong>Smart productivity</strong>
+              <small>planner, goals, streaks & focus tools</small>
+            </div>
+          </div>
+          <div class="feature-card">
+            <span class="check-icon">✓</span>
+            <div>
+              <strong>Performance intelligence</strong>
+              <small>attendance, analytics & academic reports</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-footer-credit">
+        Engineering Study Planner Pro • Created by Patil Kapil
+      </div>
+    </div>
+
+    <div class="auth-card-container">
+      <div class="auth-card">
+        <div class="security-badge">
+          <span class="dot"></span> Secure workspace
+        </div>
+
+        <div class="auth-tabs">
+          <button class="active" data-auth="login">Login</button>
+          <button data-auth="signup">Create account</button>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <form id="loginForm">
+          <h2>Welcome back 👋</h2>
+          <p class="muted">Continue managing your semester.</p>
+          <label>Email<input id="loginEmail" type="email" required placeholder="you@example.com"></label>
+          <label>Password<input id="loginPassword" type="password" required placeholder="••••••••"></label>
+          <button class="primary full" type="submit">Login to planner →</button>
+          <p class="form-footnote">Your academic data is isolated to your account.</p>
+        </form>
+
+        <!-- SIGNUP FORM -->
+        <form id="signupForm" class="hidden">
+          <h2>Create your account</h2>
+          <p class="muted">Set up your academic command center.</p>
+          <div class="two-col">
+            <label>Name<input id="signupName" required placeholder="Full name"></label>
+            <label>Roll No.<input id="signupRoll" placeholder="Roll number"></label>
+          </div>
+          <label>Email<input id="signupEmail" type="email" required placeholder="you@example.com"></label>
+          <label>Password<input id="signupPassword" type="password" required minlength="6" placeholder="Minimum 6 characters"></label>
+          <label>College<input id="signupCollege" placeholder="College name"></label>
+          <div class="two-col">
+            <label>Branch<input id="signupBranch" placeholder="Computer / IT / EC"></label>
+            <label>Semester<input id="signupSemester" placeholder="6"></label>
+          </div>
+          <button class="primary full" type="submit">Create student account →</button>
+          <p class="form-footnote">Your academic data is isolated to your account.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- APP MAIN SHELL -->
+  <section id="appView" class="app-shell hidden">
+    <!-- MAIN SIDEBAR -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">EP</div>
+        <div>
+          <strong>Engineering</strong>
+          <small>Study Planner <span>PRO</span></small>
+        </div>
+      </div>
+      
+      <div class="sidebar-creator">Created by Patil Kapil</div>
+
+      <nav id="sideNav">
+        <div class="nav-section-label">WORKSPACE</div>
+        <button class="nav-item active" data-page="dashboard">⌂ <span>Dashboard</span></button>
+        <button class="nav-item" data-page="subjects">📚 <span>Subjects</span></button>
+        <button class="nav-item" data-page="assignments">✓ <span>Assignments</span></button>
+        <button class="nav-item" data-page="exams">🗓 <span>Exams</span></button>
+        <button class="nav-item" data-page="timetable">⏱ <span>Timetable</span></button>
+        <button class="nav-item" data-page="notes">📝 <span>Notes</span></button>
+        <button class="nav-item" data-page="attendance">📊 <span>Attendance</span></button>
+        <button class="nav-item" data-page="attendance-intelligence">🎯 <span>Attendance Intelligence</span></button>
+
+        <div class="nav-section-label">SMART TOOLS</div>
+        <button class="nav-item" data-page="planner">🤖 <span>Smart Planner</span></button>
+        <button class="nav-item" data-page="exam-prep">📝 <span>Exam Prep</span></button>
+
+        <div class="nav-section-label">ANALYTICS</div>
+        <button class="nav-item" data-page="notifications">🔔 <span>Notifications</span></button>
+        <button class="nav-item" data-page="goals">🎯 <span>Goals & Streak</span></button>
+
+        <div class="nav-section-label">ACCOUNT</div>
+        <button class="nav-item" data-page="profile">⚙ <span>Profile & Security</span></button>
+        <button class="nav-item admin-only hidden" data-page="admin">🛡 <span>Admin Panel</span></button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="theme-control">
+          <span>Theme</span>
+          <button id="themeBtn" class="theme-toggle-pill">
+            <span class="light-label">Light</span>
+            <span class="dark-label">Dark</span>
+          </button>
+        </div>
+        <button id="logoutBtn" class="logout">↪ Logout</button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT VIEW -->
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button id="mobileMenu" class="mobile-menu">☰</button>
+          <div>
+            <div class="eyebrow" id="pageEyebrow">OVERVIEW</div>
+            <h1 id="pageTitle">Dashboard <span id="topbarClock" class="clock-display">01:21 AM</span></h1>
+          </div>
+        </div>
+        <div class="top-actions">
+          <button id="timerModalBtn" class="icon-btn" title="Focus Session Timer">⏱️</button>
+          <button id="searchBtn" class="icon-btn" title="Search">🔍</button>
+          <button id="topThemeBtn" class="icon-btn" title="Toggle Theme">☀️</button>
+          <button id="backupBtn" class="secondary">⇩ Backup JSON</button>
+          <button id="pdfBtn" class="primary">⇩ PDF Report</button>
+          <div class="avatar" id="avatar">P</div>
+        </div>
+      </header>
+
+      <div id="pageContent"></div>
+    </main>
+  </section>
+
+  <!-- FOCUS SESSION MODAL -->
+  <div id="focusModal" class="modal hidden">
+    <div class="modal-box focus-modal-box">
+      <button class="modal-close" id="focusModalClose">×</button>
+      <div class="focus-modal-content">
+        <div class="eyebrow">DEEP WORK MODE</div>
+        <h2>Focus session</h2>
+        <p class="muted">Put your phone away. One task. Full attention.</p>
+
+        <div class="timer-display-circle">
+          <span id="focusDisplay">25:00</span>
+          <small id="focusStateLabel">FOCUS</small>
+        </div>
+
+        <div class="timer-presets">
+          <button class="preset-btn active" data-time="25">25 min</button>
+          <button class="preset-btn" data-time="50">50 min</button>
+          <button class="preset-btn" data-time="90">90 min</button>
+        </div>
+
+        <div class="focus-actions">
+          <button id="resetFocusBtn" class="secondary">Reset</button>
+          <button id="startFocusBtn" class="primary">Start focus</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STANDARD EDIT / ADD MODAL -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-box">
+      <button class="modal-close" id="modalClose">×</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAVIGATION FOR MOBILE -->
+  <nav class="bottom-nav" id="bottomNav">
+    <button data-page="dashboard">⌂<small>Home</small></button>
+    <button data-page="subjects">📚<small>Subjects</small></button>
+    <button data-page="assignments">✓<small>Tasks</small></button>
+    <button data-page="exams">🗓<small>Exams</small></button>
+    <button data-page="planner">🤖<small>Planner</small></button>
     <button data-page="profile">⚙<small>Profile</small></button>
   </nav>
 
