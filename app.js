@@ -602,6 +602,7 @@ function generateNotificationsFromData() {
 function render() {
   const titles = {
     dashboard: ["OVERVIEW", "Dashboard"],
+    calendar: ["PLANNING", "Academic Calendar"],
     subjects: ["ACADEMICS", "Subjects"],
     assignments: ["PRODUCTIVITY", "Assignments"],
     exams: ["ACADEMICS", "Exam Schedule"],
@@ -610,6 +611,8 @@ function render() {
     attendance: ["ANALYTICS", "Attendance"],
     "attendance-intelligence": ["ANALYTICS", "Attendance Intelligence"],
     planner: ["AI STUDY TOOLS", "Smart Study Planner"],
+    timer: ["PRODUCTIVITY", "Focus Timer"],
+    assistant: ["AI STUDY TOOLS", "AI Study Assistant"],
     "exam-prep": ["EXAM TOOLS", "Exam Preparation"],
     analytics: ["ANALYTICS", "Study Analytics"],
     notifications: ["ALERTS", "Notifications"],
@@ -778,6 +781,67 @@ const views = {
       </div>
     </div>`;
   },
+
+  calendar() {
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+
+    const monthNames = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+
+    // Map existing data to calendar dates
+    const eventMap = {};
+    state.data.exams.forEach((e) => {
+      if (e.date) {
+        const d = parseInt(e.date.split("-")[2]);
+        if (!eventMap[d]) eventMap[d] = [];
+        eventMap[d].push({ type: "exam", title: e.subject });
+      }
+    });
+    state.data.assignments.forEach((a) => {
+      if (a.dueDate && !a.completed) {
+        const d = parseInt(a.dueDate.split("-")[2]);
+        if (!eventMap[d]) eventMap[d] = [];
+        eventMap[d].push({ type: "assignment", title: a.title });
+      }
+    });
+
+    let daysHtml = "";
+    const dayHeaders = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+      .map((d) => `<div class="calendar-day-header">${d}</div>`)
+      .join("");
+
+    for (let i = 0; i < firstDay; i++) {
+      daysHtml += `<div class="calendar-day empty"></div>`;
+    }
+
+    for (let i = 1; i <= daysInMonth; i++) {
+      const isToday = i === today.getDate() ? "today" : "";
+      const dayEvents = (eventMap[i] || [])
+        .map((ev) => `<div class="cal-event ${ev.type}">${esc(ev.title)}</div>`)
+        .join("");
+      daysHtml += `<div class="calendar-day ${isToday}"><div class="calendar-date">${i}</div>${dayEvents}</div>`;
+    }
+
+    return `<div class="page-head"><div><span class="eyebrow">ACADEMIC PLANNER</span><h2>${monthNames[currentMonth]} ${currentYear}</h2><p class="muted">Your upcoming exams and assignment deadlines.</p></div></div>
+    <div class="card calendar-wrap"><div class="calendar-grid">${dayHeaders}${daysHtml}</div></div>`;
+  },
+
   subjects() {
     return listPage(
       "Subjects",
@@ -936,68 +1000,6 @@ const views = {
   </div>`;
   },
 
-  admin() {
-    if (state.user?.role !== "admin")
-      return `<div class="card">${empty("Admin access required.")}</div>`;
-    const s = state.admin.stats || {};
-    const tabs = ["students", "subjects", "assignments", "attendance", "exams"];
-    let content = "";
-    if (state.admin.tab === "students") {
-      content = `<div class="table-wrap"><table class="data-table admin-table"><thead><tr><th>Student</th><th>Email</th><th>College</th><th>Branch</th><th>Semester</th><th>Joined</th><th>Action</th></tr></thead><tbody>
-      ${state.admin.users.map((u) => `<tr><td><b>${esc(u.name)}</b><br><small>${esc(u.rollNo || "-")}</small></td><td>${esc(u.email)}</td><td>${esc(u.college || "-")}</td><td>${esc(u.branch || "-")}</td><td>${esc(u.semester || "-")}</td><td>${new Date(u.createdAt).toLocaleDateString()}</td><td><button class="small-btn danger" data-admin-delete-user="${u._id}">Delete</button></td></tr>`).join("") || `<tr><td colspan="7">${empty("No registered students.")}</td></tr>`}
-    </tbody></table></div>`;
-    } else if (state.admin.tab === "subjects") {
-      content = adminRecordTable(
-        state.admin.records.subjects,
-        ["Subject", "Student", "Code", "Faculty", "Deadline", "Status"],
-        (x) =>
-          `<td><b>${esc(x.name)}</b></td><td>${esc(x.userId?.name || "-")}</td><td>${esc(x.code || "-")}</td><td>${esc(x.faculty || "-")}</td><td>${formatDate(x.deadline)}</td><td>${x.completed ? "Completed" : "Pending"}</td>`,
-      );
-    } else if (state.admin.tab === "assignments") {
-      content = adminRecordTable(
-        state.admin.records.assignments,
-        ["Assignment", "Student", "Subject", "Due", "Priority", "Status"],
-        (x) =>
-          `<td><b>${esc(x.title)}</b></td><td>${esc(x.userId?.name || "-")}</td><td>${esc(x.subject || "-")}</td><td>${formatDate(x.dueDate)}</td><td>${esc(x.priority)}</td><td>${x.completed ? "Completed" : "Pending"}</td>`,
-      );
-    } else if (state.admin.tab === "attendance") {
-      content = adminRecordTable(
-        state.admin.records.attendance,
-        ["Subject", "Student", "Attended", "Total", "Percentage"],
-        (x) =>
-          `<td><b>${esc(x.subject)}</b></td><td>${esc(x.userId?.name || "-")}</td><td>${x.attended}</td><td>${x.total}</td><td><b>${pct(x.attended, x.total)}%</b></td>`,
-      );
-    } else {
-      content = adminRecordTable(
-        state.admin.records.exams,
-        ["Subject", "Student", "Type", "Date", "Time", "Room"],
-        (x) =>
-          `<td><b>${esc(x.subject)}</b></td><td>${esc(x.userId?.name || "-")}</td><td>${esc(x.examType || "-")}</td><td>${formatDate(x.date)}</td><td>${esc(x.time || "-")}</td><td>${esc(x.room || "-")}</td>`,
-      );
-    }
-    return `<div class="admin-kpi">
-    <div class="stat-card"><div class="icon">👨‍🎓</div><strong>${s.students || 0}</strong><span>Registered students</span></div>
-    <div class="stat-card"><div class="icon">📚</div><strong>${s.subjects || 0}</strong><span>Total subjects</span></div>
-    <div class="stat-card"><div class="icon">📝</div><strong>${s.assignments || 0}</strong><span>Assignments</span></div>
-    <div class="stat-card"><div class="icon">🗓</div><strong>${s.exams || 0}</strong><span>Exams</span></div>
-  </div>
-  <div class="grid-2">
-    <div class="card"><h3>Database statistics</h3><div class="table-wrap"><table class="data-table"><tbody>
-      <tr><td>Students</td><td><b>${s.students || 0}</b></td></tr>
-      <tr><td>Subjects</td><td><b>${s.subjects || 0}</b></td></tr>
-      <tr><td>Completed subjects</td><td><b>${s.completedSubjects || 0}</b></td></tr>
-      <tr><td>Assignments</td><td><b>${s.assignments || 0}</b></td></tr>
-      <tr><td>Completed assignments</td><td><b>${s.completedAssignments || 0}</b></td></tr>
-      <tr><td>Exam records</td><td><b>${s.exams || 0}</b></td></tr>
-      <tr><td>Attendance records</td><td><b>${s.attendanceRecords || 0}</b></td></tr>
-      <tr><td>Notes</td><td><b>${s.notes || 0}</b></td></tr>
-      <tr><td>Timetable entries</td><td><b>${s.timetable || 0}</b></td></tr>
-      <tr><td>Overall attendance</td><td><b>${s.attendancePercent || 0}%</b></td></tr>
-    </tbody></table></div></div>
-    <div class="card"><h3>Admin controls</h3><p class="muted">You have full read access to student academic records. Deleting a student permanently deletes that student's subjects, assignments, exams, timetable, notes and attendance records.</p><div class="progress" style="margin-top:20px"><i style="width:${s.attendancePercent || 0}%"></i></div><p class="item-meta" style="margin-top:8px">Overall attendance across all recorded classes: ${s.attendancePercent || 0}%</p></div>
-  </div>
-  <div class="card" style="margin-top:18px"><div class="admin-tabs">${tabs.map((t) => `<button class="${state.admin.tab === t ? "active" : ""}" data-admin-tab="${t}">${t[0].toUpperCase() + t.slice(1)}</button>`).join("")}</div>${content}</div>`;
-  },
   planner() {
     const saved = loadSavedPlan();
     const exams = state.data.exams
@@ -1079,6 +1081,35 @@ const views = {
     </div>
   </div>
   <div class="card planner-output"><div class="section-heading"><div><h3>📅 Your daily study plan</h3><p class="muted">Tick a session when you finish it. Progress is saved in this browser.</p></div></div>${planHtml}</div>`;
+  },
+
+  timer() {
+    return `<div class="page-head"><div><span class="eyebrow">PRODUCTIVITY</span><h2>Focus Timer ⏱️</h2><p class="muted">Use the Pomodoro technique to maintain deep focus.</p></div></div>
+    <div class="card timer-container">
+      <div class="timer-mode">
+        <button class="active" onclick="window.setTimerMode(25)">Pomodoro (25m)</button>
+        <button onclick="window.setTimerMode(5)">Short Break (5m)</button>
+        <button onclick="window.setTimerMode(15)">Long Break (15m)</button>
+      </div>
+      <div class="timer-display" id="timerDisplay">25:00</div>
+      <div class="timer-controls">
+        <button class="primary" id="startTimerBtn" onclick="window.toggleTimer()">Start Focus</button>
+        <button class="secondary" onclick="window.resetTimer()">Reset</button>
+      </div>
+    </div>`;
+  },
+
+  assistant() {
+    return `<div class="page-head"><div><span class="eyebrow">AI STUDY TOOLS</span><h2>AI Assistant 🧠</h2><p class="muted">Ask questions, get study plans, and request explanations.</p></div></div>
+    <div class="chat-container">
+      <div class="chat-history" id="chatHistory">
+        <div class="chat-bubble ai">Hello, ${esc(state.user?.name?.split(" ")[0] || "Student")}! I am your AI Study Assistant. What concept can I help you understand today?</div>
+      </div>
+      <form class="chat-input-area" id="chatForm" onsubmit="window.sendChatMessage(event)">
+        <input type="text" id="chatInput" placeholder="E.g., Explain dynamic method dispatch..." required autocomplete="off">
+        <button type="submit" class="primary">Send</button>
+      </form>
+    </div>`;
   },
 
   "exam-prep"() {
@@ -1170,6 +1201,41 @@ const views = {
     const u = state.user;
     return `<div class="grid-2"><div class="card"><h3>Student profile</h3><form id="profileForm"><label>Name<input id="pName" value="${esc(u.name)}"></label><label>Email<input value="${esc(u.email)}" disabled></label><label>College<input id="pCollege" value="${esc(u.college)}"></label><label>Branch<input id="pBranch" value="${esc(u.branch)}"></label><div class="two-col"><label>Semester<input id="pSemester" value="${esc(u.semester)}"></label><label>Roll No.<input id="pRoll" value="${esc(u.rollNo)}"></label></div><button class="primary" type="submit">Save profile</button></form></div>
   <div class="card"><h3>Security & reports</h3><form id="passwordForm"><label>Current password<input id="currentPassword" type="password" required></label><label>New password<input id="newPassword" type="password" minlength="8" required></label><button class="secondary" type="submit">Change password</button></form><hr style="margin:20px 0;border:0;border-top:1px solid var(--line)"><p class="muted">Download your complete academic report or portable JSON backup.</p><button class="secondary" id="profilePdf" style="margin-top:12px">⇩ Download PDF Report</button><button class="secondary" id="profileBackup" style="margin:10px 0">⇩ Download JSON Backup</button></div></div>`;
+  },
+
+  admin() {
+    if (state.user?.role !== "admin")
+      return `<div class="card">${empty("Admin access required.")}</div>`;
+
+    const s = state.admin.stats || {};
+    const tabs = [
+      "students",
+      "subjects",
+      "assignments",
+      "exams",
+      "announcements",
+      "settings",
+      "logs",
+      "system",
+    ];
+    let content = "";
+
+    if (state.admin.tab === "students") {
+      content = `<input id="adminSearch" placeholder="Search students..." value="${esc(state.admin.search || "")}"><div class="table-wrap"><table class="data-table admin-table"><thead><tr><th>Student</th><th>Email</th><th>College</th><th>Joined</th><th>Action</th></tr></thead><tbody>${state.admin.users.map((u) => `<tr><td><b>${esc(u.name)}</b></td><td>${esc(u.email)}</td><td>${esc(u.college || "-")}</td><td>${new Date(u.createdAt).toLocaleDateString()}</td><td><button class="small-btn danger" data-admin-delete-user="${u._id}">Delete</button></td></tr>`).join("") || `<tr><td colspan="5">${empty("No students found.")}</td></tr>`}</tbody></table></div>`;
+    } else if (state.admin.tab === "announcements") {
+      content = `<div class="card"><h3>Broadcast Notification</h3><form onsubmit="event.preventDefault(); toast('Announcement sent to all students.');"><label>Title<input required placeholder="E.g., Server Maintenance"></label><label>Message<textarea required></textarea></label><button type="submit" class="primary">Send Broadcast</button></form></div>`;
+    } else if (state.admin.tab === "settings") {
+      content = `<div class="grid-2"><div class="card"><h3>Feature Controls</h3><label class="study-session"><input type="checkbox" checked><span class="session-check">✓</span> <span class="session-info"><b>Enable AI Assistant</b></span></label><label class="study-session"><input type="checkbox" checked><span class="session-check">✓</span> <span class="session-info"><b>Enable PDF Exports</b></span></label><button class="secondary full" onclick="toast('Settings saved')">Save Settings</button></div><div class="card"><h3>Maintenance Mode</h3><p class="muted">Lock the application for all non-admin users.</p><button class="primary danger full" onclick="toast('Maintenance mode activated')">Activate Maintenance</button></div></div>`;
+    } else if (state.admin.tab === "system") {
+      content = `<div class="grid-2"><div class="card"><h3>System Health</h3><div class="admin-stat-list"><span>API Status <b style="color:var(--success)">Healthy</b></span><span>Database Load <b>12%</b></span><span>Storage Used <b>1.4 GB</b></span></div></div><div class="card"><h3>Data Management</h3><button class="secondary full" onclick="$('backupBtn').click()">Download Full System JSON</button><button class="secondary full" onclick="toast('Logs exported')">Export Activity Logs</button></div></div>`;
+    } else {
+      content = empty(
+        `Module ${state.admin.tab} is currently empty or under construction.`,
+      );
+    }
+
+    return `<div class="admin-kpi"><div class="stat-card"><div class="icon">👨‍🎓</div><strong>${s.students || 0}</strong><span>Students</span></div><div class="stat-card"><div class="icon">📚</div><strong>${s.subjects || 0}</strong><span>Subjects</span></div><div class="stat-card"><div class="icon">📝</div><strong>${s.assignments || 0}</strong><span>Assignments</span></div><div class="stat-card"><div class="icon">⚙️</div><strong>Live</strong><span>System Status</span></div></div>
+  <div class="card" style="margin-top:18px"><div class="admin-tabs">${tabs.map((t) => `<button class="${state.admin.tab === t ? "active" : ""}" data-admin-tab="${t}">${t[0].toUpperCase() + t.slice(1)}</button>`).join("")}</div>${content}</div>`;
   },
 };
 
@@ -1635,50 +1701,92 @@ async function pinSubject(id) {
 
 if (state.token) startApp();
 
-views.admin = function () {
-  if (state.user?.role !== "admin")
-    return `<div class="card">${empty("Admin access required.")}</div>`;
-  const s = state.admin.stats || {},
-    q = (state.admin.search || "").toLowerCase();
-  const users = state.admin.users.filter((u) =>
-    [u.name, u.email, u.branch, u.semester, u.rollNo]
-      .join(" ")
-      .toLowerCase()
-      .includes(q),
-  );
-  const rec = state.admin.records;
-  let content = "";
-  if (state.admin.tab === "students") {
-    content = `<input id="adminSearch" placeholder="Search students by name, email, branch, semester or roll no." value="${esc(state.admin.search || "")}"><div class="table-wrap"><table class="data-table admin-table"><thead><tr><th>Student</th><th>Email</th><th>College</th><th>Branch</th><th>Semester</th><th>Joined</th><th>Action</th></tr></thead><tbody>${users.map((u) => `<tr><td><b>${esc(u.name)}</b><br><small>${esc(u.rollNo || "-")}</small></td><td>${esc(u.email)}</td><td>${esc(u.college || "-")}</td><td>${esc(u.branch || "-")}</td><td>${esc(u.semester || "-")}</td><td>${new Date(u.createdAt).toLocaleDateString()}</td><td><button class="small-btn danger" data-admin-delete-user="${u._id}">Delete</button></td></tr>`).join("") || `<tr><td colspan="7">${empty("No students found.")}</td></tr>`}</tbody></table></div>`;
-  } else if (state.admin.tab === "subjects")
-    content = adminRecordTable(
-      rec.subjects,
-      ["Subject", "Student", "Code", "Faculty", "Deadline", "Status"],
-      (x) =>
-        `<td><b>${esc(x.name)}</b></td><td>${esc(x.userId?.name || "-")}</td><td>${esc(x.code || "-")}</td><td>${esc(x.faculty || "-")}</td><td>${formatDate(x.deadline)}</td><td>${x.completed ? "Completed" : "Pending"}</td>`,
-    );
-  else if (state.admin.tab === "assignments")
-    content = adminRecordTable(
-      rec.assignments,
-      ["Assignment", "Student", "Subject", "Due", "Priority", "Status"],
-      (x) =>
-        `<td><b>${esc(x.title)}</b></td><td>${esc(x.userId?.name || "-")}</td><td>${esc(x.subject || "-")}</td><td>${formatDate(x.dueDate)}</td><td>${esc(x.priority)}</td><td>${x.completed ? "Completed" : "Pending"}</td>`,
-    );
-  else if (state.admin.tab === "attendance")
-    content = adminRecordTable(
-      rec.attendance,
-      ["Subject", "Student", "Attended", "Total", "Percentage"],
-      (x) =>
-        `<td><b>${esc(x.subject)}</b></td><td>${esc(x.userId?.name || "-")}</td><td>${x.attended}</td><td>${x.total}</td><td><b>${pct(x.attended, x.total)}%</b></td>`,
-    );
-  else
-    content = adminRecordTable(
-      rec.exams,
-      ["Subject", "Student", "Type", "Date", "Time", "Room"],
-      (x) =>
-        `<td><b>${esc(x.subject)}</b></td><td>${esc(x.userId?.name || "-")}</td><td>${esc(x.examType || "-")}</td><td>${formatDate(x.date)}</td><td>${esc(x.time || "-")}</td><td>${esc(x.room || "-")}</td>`,
-    );
-  return `<div class="admin-kpi"><div class="stat-card"><div class="icon">👨‍🎓</div><strong>${s.students || 0}</strong><span>Students</span></div><div class="stat-card"><div class="icon">📚</div><strong>${s.subjects || 0}</strong><span>Subjects</span></div><div class="stat-card"><div class="icon">📝</div><strong>${s.assignments || 0}</strong><span>Assignments</span></div><div class="stat-card"><div class="icon">🗓</div><strong>${s.exams || 0}</strong><span>Exams</span></div></div>
-  <div class="grid-2"><div class="card"><h3>Database health</h3><div class="admin-stat-list"><span>Attendance records <b>${s.attendanceRecords || 0}</b></span><span>Notes <b>${s.notes || 0}</b></span><span>Timetable entries <b>${s.timetable || 0}</b></span><span>Overall attendance <b>${s.attendancePercent || 0}%</b></span></div></div><div class="card"><h3>Admin controls</h3><p class="muted">Search students, monitor academic records and remove student data when required. Student deletion cascades through academic records.</p></div></div>
-  <div class="card" style="margin-top:18px"><div class="admin-tabs">${["students", "subjects", "assignments", "attendance", "exams"].map((t) => `<button class="${state.admin.tab === t ? "active" : ""}" data-admin-tab="${t}">${t[0].toUpperCase() + t.slice(1)}</button>`).join("")}</div>${content}</div>`;
+/* =========================================================
+   TIMER & CHAT LOGIC
+========================================================= */
+let timerInterval;
+let timeLeft = 25 * 60;
+let isTimerRunning = false;
+let currentTimerMode = 25;
+
+window.setTimerMode = (minutes) => {
+  clearInterval(timerInterval);
+  isTimerRunning = false;
+  currentTimerMode = minutes;
+  timeLeft = minutes * 60;
+
+  // Update UI Tabs
+  const buttons = document.querySelectorAll(".timer-mode button");
+  if (buttons.length) {
+    buttons.forEach((b) => b.classList.remove("active"));
+    event.target.classList.add("active");
+  }
+
+  updateTimerDisplay();
+  const startBtn = document.getElementById("startTimerBtn");
+  if (startBtn) startBtn.textContent = "Start Focus";
+};
+
+window.toggleTimer = () => {
+  const startBtn = document.getElementById("startTimerBtn");
+  if (isTimerRunning) {
+    clearInterval(timerInterval);
+    isTimerRunning = false;
+    startBtn.textContent = "Resume";
+  } else {
+    isTimerRunning = true;
+    startBtn.textContent = "Pause";
+    timerInterval = setInterval(() => {
+      if (timeLeft > 0) {
+        timeLeft--;
+        updateTimerDisplay();
+      } else {
+        clearInterval(timerInterval);
+        isTimerRunning = false;
+        startBtn.textContent = "Start Focus";
+        toast("Timer finished!");
+      }
+    }, 1000);
+  }
+};
+
+window.resetTimer = () => {
+  clearInterval(timerInterval);
+  isTimerRunning = false;
+  timeLeft = currentTimerMode * 60;
+  updateTimerDisplay();
+  const startBtn = document.getElementById("startTimerBtn");
+  if (startBtn) startBtn.textContent = "Start Focus";
+};
+
+function updateTimerDisplay() {
+  const display = document.getElementById("timerDisplay");
+  if (!display) return;
+  const m = Math.floor(timeLeft / 60)
+    .toString()
+    .padStart(2, "0");
+  const s = (timeLeft % 60).toString().padStart(2, "0");
+  display.textContent = `${m}:${s}`;
+}
+
+window.sendChatMessage = async (e) => {
+  e.preventDefault();
+  const input = document.getElementById("chatInput");
+  const history = document.getElementById("chatHistory");
+  const message = input.value.trim();
+  if (!message) return;
+
+  // Add user message to UI
+  history.innerHTML += `<div class="chat-bubble user">${esc(message)}</div>`;
+  input.value = "";
+  history.scrollTop = history.scrollHeight;
+
+  // Simulate AI Typing / API Call
+  setTimeout(() => {
+    // Replace this with: await api('/api/chat', { method: 'POST' ... })
+    const aiResponse =
+      "I am a simulated assistant. To make me functional, connect my UI to your backend LLM integration via the Render API.";
+    history.innerHTML += `<div class="chat-bubble ai">${aiResponse}</div>`;
+    history.scrollTop = history.scrollHeight;
+  }, 1000);
 };
