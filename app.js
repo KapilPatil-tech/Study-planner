@@ -546,3 +546,19 @@ $("resetFocusBtn").onclick = () => {
 };
 
 if (state.token) startApp();
+
+async function startApp() {
+  try {
+    state.user = await api("/api/me");
+    state.data = await api("/api/data");
+    if (state.user.role === "admin") await loadAdmin();
+    authView.classList.add("hidden");
+    appView.classList.remove("hidden");
+    $("avatar").textContent = (state.user.name || "P")[0].toUpperCase();
+    render();
+  } catch (err) {
+    console.error("StartApp failed:", err); // ADD THIS LINE
+    toast("Error loading user data. Check console."); // ADD THIS LINE
+    logout(false);
+  }
+}
