@@ -36,6 +36,7 @@ function toast(message) {
   setTimeout(() => el.remove(), 2600);
 }
 
+// Live Clock in Topbar
 function updateClock() {
   const now = new Date();
   const timeStr = now.toLocaleTimeString([], {
@@ -53,14 +54,22 @@ async function api(url, options = {}) {
     "Content-Type": "application/json",
     ...(options.headers || {}),
   };
-  if (state.token) headers.Authorization = `Bearer ${state.token}`;
 
-  const res = await fetch(`${API_BASE}${url}`, { ...options, headers });
+  if (state.token) {
+    headers.Authorization = `Bearer ${state.token}`;
+  }
+
+  const res = await fetch(`${API_BASE}${url}`, {
+    ...options,
+    headers,
+  });
+
   if (res.status === 401) {
     logout(false);
     throw new Error("Session expired");
   }
 
+  // FIXED: Safely handle JSON parsing for 304 Not Modified responses
   let data;
   try {
     data = await res.json();
@@ -73,6 +82,7 @@ async function api(url, options = {}) {
       data && data.message ? data.message : `Request failed (${res.status})`,
     );
   }
+
   return data;
 }
 
@@ -139,7 +149,7 @@ async function startApp() {
     render();
   } catch (err) {
     console.error("StartApp failed:", err);
-    toast("Error loading user data.");
+    toast("Error loading user data. Check console.");
     logout(false);
   }
 }
@@ -166,9 +176,11 @@ function logout(show = true) {
   if (show) toast("Logged out.");
 }
 
+// FIXED: Safely attach logout button
 const logoutBtn = $("logoutBtn");
 if (logoutBtn) logoutBtn.onclick = () => logout(true);
 
+// Navigation Handlers
 document.querySelectorAll(".nav-item, .bottom-nav button").forEach((btn) => {
   btn.onclick = () => {
     state.page = btn.dataset.page;
@@ -182,6 +194,27 @@ document.querySelectorAll(".nav-item, .bottom-nav button").forEach((btn) => {
   };
 });
 
+// Mobile Sidebar Controls
+const sidebar = document.querySelector(".sidebar");
+const mobileMenu = $("mobileMenu");
+if (mobileMenu && sidebar) {
+  mobileMenu.onclick = (e) => {
+    e.stopPropagation();
+    sidebar.classList.toggle("open");
+  };
+  document.addEventListener("click", (e) => {
+    if (
+      window.innerWidth <= 800 &&
+      sidebar.classList.contains("open") &&
+      !sidebar.contains(e.target) &&
+      !mobileMenu.contains(e.target)
+    ) {
+      sidebar.classList.remove("open");
+    }
+  });
+}
+
+// Theme Toggles
 function toggleTheme() {
   document.body.classList.toggle("dark-mode");
   const isDark = document.body.classList.contains("dark-mode");
@@ -190,6 +223,7 @@ function toggleTheme() {
   if (topThemeBtn) topThemeBtn.textContent = isDark ? "🌙" : "☀️";
 }
 
+// FIXED: Safely attach theme buttons
 const themeBtn = $("themeBtn");
 if (themeBtn) themeBtn.onclick = toggleTheme;
 
@@ -201,8 +235,17 @@ if (localStorage.getItem("esp_theme") === "dark") {
   if (topThemeBtn) topThemeBtn.textContent = "🌙";
 }
 
+// FIXED: Safely attach modal buttons
 const modalClose = $("modalClose");
 if (modalClose) modalClose.onclick = () => modal.classList.add("hidden");
+
+const focusModalBtn = $("focusModalBtn");
+if (focusModalBtn)
+  focusModalBtn.onclick = () => focusModal.classList.remove("hidden");
+
+const focusModalClose = $("focusModalClose");
+if (focusModalClose)
+  focusModalClose.onclick = () => focusModal.classList.add("hidden");
 
 function esc(s) {
   return String(s ?? "").replace(
@@ -218,11 +261,15 @@ function esc(s) {
   );
 }
 
+function pct(a, b) {
+  return b ? Math.min(100, Math.round((a / b) * 100)) : 0;
+}
+
 function empty(text) {
   return `<div class="empty">${esc(text)}</div>`;
 }
 
-// UI RENDER VIEWS
+// FIXED: Moved views object ABOVE the render function
 const views = {
   dashboard() {
     const d = state.data;
@@ -247,84 +294,152 @@ const views = {
       </div>
       <div class="hero-score"><span>Productivity</span><strong>0%</strong><small>Based on progress & attendance</small></div>
     </section>
+
     <div class="stats">
-      <div class="stat-card"><span>Total subjects</span><strong>${d.subjects?.length || 0}</strong></div>
-      <div class="stat-card"><span>Pending assignments</span><strong>${d.assignments?.filter((x) => !x.completed).length || 0}</strong></div>
-      <div class="stat-card"><span>Upcoming exams</span><strong>${d.exams?.length || 0}</strong></div>
-      <div class="stat-card"><span>Average attendance</span><strong>0%</strong></div>
+      <div class="stat-card"><span>Total subjects</span><strong>${d.subjects.length}</strong><small class="muted">0 completed</small></div>
+      <div class="stat-card"><span>Pending assignments</span><strong>${d.assignments.filter((x) => !x.completed).length}</strong><small class="muted">0% completed</small></div>
+      <div class="stat-card"><span>Upcoming exams</span><strong>${d.exams.length}</strong><small class="muted">Next 30-day view</small></div>
+      <div class="stat-card"><span>Average attendance</span><strong>0%</strong><small class="muted">✓ On track</small></div>
+    </div>
+
+    <div class="dashboard-grid-main">
+      <div class="card">
+        <div class="panel-heading"><h3>Today's Schedule</h3><button class="secondary" data-action="add-timetable">+ Add Class</button></div>
+        <p class="muted">No classes scheduled for ${dayName}.</p>
+      </div>
+      <div class="card">
+        <div class="panel-heading"><h3>Upcoming Deadlines</h3></div>
+        <p class="muted">No upcoming deadlines or exams.</p>
+      </div>
     </div>`;
-  },
-
-  subjects() {
-    const d = state.data.subjects || [];
-    let content =
-      d.length === 0
-        ? `<div class="card empty-state"><p class="muted">No subjects added yet.</p></div>`
-        : `<div class="card-grid">${d
-            .map(
-              (s) => `
-          <div class="card">
-            <h3>${esc(s.name || s.title)}</h3>
-            <p class="muted">${esc(s.code || "No Code")}</p>
-            <div style="margin-top: 15px;">
-              <button class="small-btn danger" onclick="deleteSubject('${s._id}')">Delete</button>
-            </div>
-          </div>
-        `,
-            )
-            .join("")}</div>`;
-
-    return `
-      <div class="panel-heading">
-        <div>
-          <h2>Your Subjects</h2>
-          <p class="muted">Manage your coursework and syllabus.</p>
-        </div>
-        <button class="primary" onclick="openSubjectModal()">+ Add Subject</button>
-      </div>
-      ${content}
-    `;
-  },
-
-  assignments() {
-    const d = state.data.assignments || [];
-    let content =
-      d.length === 0
-        ? `<div class="card empty-state"><p class="muted">You have no pending assignments. Take a break!</p></div>`
-        : `<div class="list-container">${d
-            .map(
-              (a) => `
-          <div class="card list-item ${a.completed ? "completed" : ""}">
-            <div>
-              <h3>${esc(a.title)}</h3>
-              <p class="muted">Due: ${esc(new Date(a.dueDate).toLocaleDateString())}</p>
-            </div>
-            <div>
-              <button class="small-btn" onclick="toggleAssignment('${a._id}')">${a.completed ? "Undo" : "Complete"}</button>
-              <button class="small-btn danger" onclick="deleteAssignment('${a._id}')">Delete</button>
-            </div>
-          </div>
-        `,
-            )
-            .join("")}</div>`;
-
-    return `
-      <div class="panel-heading">
-        <div>
-          <h2>Assignments & Tasks</h2>
-          <p class="muted">Keep track of your academic deadlines.</p>
-        </div>
-        <button class="primary" onclick="openAssignmentModal()">+ Add Assignment</button>
-      </div>
-      ${content}
-    `;
   },
 
   admin() {
     if (state.user?.role !== "admin") return empty("Admin access required.");
-    return `<div class="card"><h3>Admin Controls</h3><p class="muted">System controls ready.</p></div>`;
+
+    const adminNavItems = [
+      { id: "overview", label: "Overview", icon: "📊" },
+      { id: "students", label: "Students", icon: "👥" },
+      { id: "academic", label: "Academic Content", icon: "📚" },
+      { id: "announcements", label: "Announcements", icon: "📢" },
+      { id: "notifications", label: "Notifications", icon: "🔔" },
+      { id: "analytics", label: "Analytics", icon: "📈" },
+      { id: "maintenance", label: "Maintenance Mode", icon: "🛠️" },
+      { id: "feature_controls", label: "Feature Controls", icon: "⚡" },
+      { id: "global_settings", label: "Global Settings", icon: "⚙️" },
+      { id: "export_approvals", label: "Export Approvals", icon: "🔒" },
+      { id: "activity_logs", label: "Activity Logs", icon: "📜" },
+      { id: "security", label: "Security", icon: "🛡️" },
+    ];
+
+    let activeContent = "";
+    const tab = state.admin.tab;
+
+    if (tab === "overview") {
+      activeContent = `
+      <div class="admin-banner">
+        <div>
+          <div class="eyebrow">ADMIN CONTROL CENTER</div>
+          <h2>System command center</h2>
+          <p class="muted">Manage users, academic content, announcements, global settings and security from one protected console.</p>
+        </div>
+        <div class="status-pill"><span class="dot"></span> System operational</div>
+      </div>
+
+      <div class="admin-stats-grid">
+        <div class="stat-card"><strong>2</strong><span>Students</span></div>
+        <div class="stat-card"><strong>8</strong><span>Subjects</span></div>
+        <div class="stat-card"><strong>2</strong><span>Assignments</span></div>
+        <div class="stat-card"><strong>2</strong><span>Exams</span></div>
+        <div class="stat-card"><strong>1</strong><span>Announcements</span></div>
+        <div class="stat-card"><strong>9</strong><span>Recent logs</span></div>
+      </div>
+
+      <div class="card">
+        <h3>Quick controls</h3>
+        <div class="quick-controls-grid">
+          <button class="quick-control-btn" data-admin-jump="announcements">📢 New announcement</button>
+          <button class="quick-control-btn" data-admin-jump="notifications">🔔 Broadcast notification</button>
+          <button class="quick-control-btn" data-admin-jump="maintenance">🛠️ Maintenance</button>
+          <button class="quick-control-btn" data-admin-jump="feature_controls">⚡ Feature controls</button>
+        </div>
+      </div>`;
+    } else if (tab === "students") {
+      activeContent = `
+      <div class="card">
+        <h3>👥 Student management</h3>
+        <p class="muted">Activate, deactivate, reset passwords or remove student accounts.</p>
+        <input style="margin:15px 0" placeholder="Search students...">
+        <table class="data-table">
+          <thead><tr><th>STUDENT</th><th>BRANCH</th><th>SEMESTER</th><th>STATUS</th><th>ACTIONS</th></tr></thead>
+          <tbody>
+            <tr><td><b>Patil Kapil</b><br><small>kpcprestor21970@gmail.com</small></td><td>CE</td><td>5</td><td><span class="status-pill">Active</span></td><td><button class="small-btn">Disable</button> <button class="small-btn">Reset password</button> <button class="small-btn danger">Delete</button></td></tr>
+          </tbody>
+        </table>
+      </div>`;
+    } else if (tab === "announcements") {
+      activeContent = `
+      <div class="two-col">
+        <div class="card">
+          <h3>📢 Create announcement</h3>
+          <label>Title<input placeholder="Important academic notice"></label>
+          <label>Message<textarea placeholder="Write the announcement..."></textarea></label>
+          <button class="primary full">Publish announcement</button>
+        </div>
+        <div class="card"><h3>Recent announcements</h3>${empty("No announcements published.")}</div>
+      </div>`;
+    } else if (tab === "maintenance") {
+      activeContent = `
+      <div class="card">
+        <h3>🛠️ Maintenance mode</h3>
+        <div class="toggle-row">
+          <div><b>Maintenance mode</b><p class="muted">Disable student access temporarily</p></div>
+          <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+        </div>
+        <label>Maintenance message<textarea>System is temporarily under maintenance. Please try again later.</textarea></label>
+        <button class="primary full">Save maintenance settings</button>
+      </div>`;
+    } else if (tab === "feature_controls") {
+      activeContent = `
+      <div class="card">
+        <h3>⚡ Feature controls</h3>
+        <p class="muted">Turn product modules on or off globally for students.</p>
+        <div class="toggle-row"><div><b>Smart Planner</b></div><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></div>
+        <div class="toggle-row"><div><b>Exam Preparation</b></div><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></div>
+        <div class="toggle-row"><div><b>Focus Timer</b></div><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></div>
+        <button class="primary full" style="margin-top:15px">Save feature controls</button>
+      </div>`;
+    } else {
+      activeContent = `<div class="card"><h3>${tab.replace("_", " ").toUpperCase()}</h3><p class="muted">Module controls ready for configuration.</p></div>`;
+    }
+
+    return `
+    <div class="admin-shell">
+      <aside class="admin-sub-sidebar">
+        <div class="admin-sidebar-header">
+          <div class="brand-mark">EP</div>
+          <div><strong>Admin Center</strong><small>Control & security</small></div>
+        </div>
+        ${adminNavItems
+          .map(
+            (item) => `
+          <button class="admin-nav-item ${tab === item.id ? "active" : ""}" data-admin-tab="${item.id}">
+            <span>${item.icon}</span> ${item.label}
+          </button>
+        `,
+          )
+          .join("")}
+      </aside>
+      <div class="admin-content-view">${activeContent}</div>
+    </div>`;
   },
 
+  subjects() {
+    return empty("Subjects management.");
+  },
+  assignments() {
+    return empty("Assignments management.");
+  },
   exams() {
     return empty("Exams management.");
   },
@@ -393,70 +508,83 @@ function render() {
 
   if (pageContent) {
     pageContent.innerHTML = views[state.page]();
+    bindPage();
   }
 }
 
-// MODAL CONTROLS & API ACTIONS
-window.openSubjectModal = () => {
-  $("modalContent").innerHTML = `
-    <h3>Add New Subject</h3>
-    <form onsubmit="submitSubject(event)">
-      <label>Subject Name<input id="newSubName" required></label>
-      <label>Subject Code<input id="newSubCode"></label>
-      <button class="primary full" type="submit" style="margin-top: 15px;">Save Subject</button>
-    </form>`;
-  modal.classList.remove("hidden");
-};
+function bindPage() {
+  document.querySelectorAll("[data-admin-tab]").forEach((b) => {
+    b.onclick = () => {
+      state.admin.tab = b.dataset.adminTab;
+      render();
+    };
+  });
+  document.querySelectorAll("[data-admin-jump]").forEach((b) => {
+    b.onclick = () => {
+      state.admin.tab = b.dataset.adminJump;
+      render();
+    };
+  });
+}
 
-window.submitSubject = async (e) => {
-  e.preventDefault();
-  const payload = { name: $("newSubName").value, code: $("newSubCode").value };
-  try {
-    // Awaiting your exact backend route format (Assuming POST /api/subjects)
-    const newSub = await api("/api/subjects", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    });
-    state.data.subjects.push(newSub);
-    modal.classList.add("hidden");
-    render();
-    toast("Subject added!");
-  } catch (err) {
-    toast(err.message);
-  }
-};
+// FOCUS TIMER LOGIC
+let focusSeconds = 25 * 60;
+let focusInterval = null;
 
-window.openAssignmentModal = () => {
-  $("modalContent").innerHTML = `
-    <h3>Add New Assignment</h3>
-    <form onsubmit="submitAssignment(event)">
-      <label>Title<input id="newAssTitle" required></label>
-      <label>Due Date<input type="date" id="newAssDate" required></label>
-      <button class="primary full" type="submit" style="margin-top: 15px;">Save Assignment</button>
-    </form>`;
-  modal.classList.remove("hidden");
-};
-
-window.submitAssignment = async (e) => {
-  e.preventDefault();
-  const payload = {
-    title: $("newAssTitle").value,
-    dueDate: $("newAssDate").value,
-    completed: false,
+document.querySelectorAll(".preset-btn").forEach((btn) => {
+  btn.onclick = () => {
+    document
+      .querySelectorAll(".preset-btn")
+      .forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    focusSeconds = Number(btn.dataset.time) * 60;
+    updateFocusDisplay();
   };
-  try {
-    // Awaiting your exact backend route format (Assuming POST /api/assignments)
-    const newAss = await api("/api/assignments", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    });
-    state.data.assignments.push(newAss);
-    modal.classList.add("hidden");
-    render();
-    toast("Assignment added!");
-  } catch (err) {
-    toast(err.message);
-  }
-};
+});
+
+function updateFocusDisplay() {
+  const m = Math.floor(focusSeconds / 60)
+    .toString()
+    .padStart(2, "0");
+  const s = (focusSeconds % 60).toString().padStart(2, "0");
+  const focusDisplay = $("focusDisplay");
+  if (focusDisplay) focusDisplay.textContent = `${m}:${s}`;
+}
+
+const startFocusBtn = $("startFocusBtn");
+if (startFocusBtn) {
+  startFocusBtn.onclick = () => {
+    if (focusInterval) {
+      clearInterval(focusInterval);
+      focusInterval = null;
+      startFocusBtn.textContent = "Start focus";
+    } else {
+      startFocusBtn.textContent = "Pause focus";
+      focusInterval = setInterval(() => {
+        if (focusSeconds > 0) {
+          focusSeconds--;
+          updateFocusDisplay();
+        } else {
+          clearInterval(focusInterval);
+          focusInterval = null;
+          toast("Focus session complete!");
+          startFocusBtn.textContent = "Start focus";
+        }
+      }, 1000);
+    }
+  };
+}
+
+const resetFocusBtn = $("resetFocusBtn");
+if (resetFocusBtn) {
+  resetFocusBtn.onclick = () => {
+    clearInterval(focusInterval);
+    focusInterval = null;
+    const activePreset = document.querySelector(".preset-btn.active");
+    focusSeconds = (activePreset ? Number(activePreset.dataset.time) : 25) * 60;
+    updateFocusDisplay();
+    if (startFocusBtn) startFocusBtn.textContent = "Start focus";
+  };
+}
 
 if (state.token) startApp();
