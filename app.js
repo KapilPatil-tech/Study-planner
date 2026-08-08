@@ -69,9 +69,13 @@ async function api(url, options = {}) {
     throw new Error("Session expired");
   }
 
-  const data = res.headers.get("content-type")?.includes("application/json")
-    ? await res.json()
-    : res;
+  // FIXED: Safely handle JSON parsing for 304 Not Modified responses
+  let data;
+  try {
+    data = await res.json();
+  } catch (err) {
+    data = res;
+  }
 
   if (!res.ok) {
     throw new Error(
@@ -143,7 +147,9 @@ async function startApp() {
     appView.classList.remove("hidden");
     $("avatar").textContent = (state.user.name || "P")[0].toUpperCase();
     render();
-  } catch {
+  } catch (err) {
+    console.error("StartApp failed:", err);
+    toast("Error loading user data. Check console.");
     logout(false);
   }
 }
@@ -170,7 +176,9 @@ function logout(show = true) {
   if (show) toast("Logged out.");
 }
 
-$("logoutBtn").onclick = () => logout(true);
+// FIXED: Safely attach logout button
+const logoutBtn = $("logoutBtn");
+if (logoutBtn) logoutBtn.onclick = () => logout(true);
 
 // Navigation Handlers
 document.querySelectorAll(".nav-item, .bottom-nav button").forEach((btn) => {
@@ -189,39 +197,55 @@ document.querySelectorAll(".nav-item, .bottom-nav button").forEach((btn) => {
 // Mobile Sidebar Controls
 const sidebar = document.querySelector(".sidebar");
 const mobileMenu = $("mobileMenu");
-mobileMenu.onclick = (e) => {
-  e.stopPropagation();
-  sidebar.classList.toggle("open");
-};
-document.addEventListener("click", (e) => {
-  if (
-    window.innerWidth <= 800 &&
-    sidebar.classList.contains("open") &&
-    !sidebar.contains(e.target) &&
-    !mobileMenu.contains(e.target)
-  ) {
-    sidebar.classList.remove("open");
-  }
-});
+if (mobileMenu && sidebar) {
+  mobileMenu.onclick = (e) => {
+    e.stopPropagation();
+    sidebar.classList.toggle("open");
+  };
+  document.addEventListener("click", (e) => {
+    if (
+      window.innerWidth <= 800 &&
+      sidebar.classList.contains("open") &&
+      !sidebar.contains(e.target) &&
+      !mobileMenu.contains(e.target)
+    ) {
+      sidebar.classList.remove("open");
+    }
+  });
+}
 
 // Theme Toggles
 function toggleTheme() {
   document.body.classList.toggle("dark-mode");
   const isDark = document.body.classList.contains("dark-mode");
   localStorage.setItem("esp_theme", isDark ? "dark" : "light");
-  $("topThemeBtn").textContent = isDark ? "🌙" : "☀️";
-}
-$("themeBtn").onclick = toggleTheme;
-$("topThemeBtn").onclick = toggleTheme;
-if (localStorage.getItem("esp_theme") === "dark") {
-  document.body.classList.add("dark-mode");
-  $("topThemeBtn").textContent = "🌙";
+  const topThemeBtn = $("topThemeBtn");
+  if (topThemeBtn) topThemeBtn.textContent = isDark ? "🌙" : "☀️";
 }
 
-// Modals
-$("modalClose").onclick = () => modal.classList.add("hidden");
-$("focusModalBtn").onclick = () => focusModal.classList.remove("hidden");
-$("focusModalClose").onclick = () => focusModal.classList.add("hidden");
+// FIXED: Safely attach theme buttons
+const themeBtn = $("themeBtn");
+if (themeBtn) themeBtn.onclick = toggleTheme;
+
+const topThemeBtn = $("topThemeBtn");
+if (topThemeBtn) topThemeBtn.onclick = toggleTheme;
+
+if (localStorage.getItem("esp_theme") === "dark") {
+  document.body.classList.add("dark-mode");
+  if (topThemeBtn) topThemeBtn.textContent = "🌙";
+}
+
+// FIXED: Safely attach modal buttons
+const modalClose = $("modalClose");
+if (modalClose) modalClose.onclick = () => modal.classList.add("hidden");
+
+const focusModalBtn = $("focusModalBtn");
+if (focusModalBtn)
+  focusModalBtn.onclick = () => focusModal.classList.remove("hidden");
+
+const focusModalClose = $("focusModalClose");
+if (focusModalClose)
+  focusModalClose.onclick = () => focusModal.classList.add("hidden");
 
 function esc(s) {
   return String(s ?? "").replace(
@@ -236,45 +260,16 @@ function esc(s) {
       })[c],
   );
 }
+
 function pct(a, b) {
   return b ? Math.min(100, Math.round((a / b) * 100)) : 0;
 }
+
 function empty(text) {
   return `<div class="empty">${esc(text)}</div>`;
 }
 
-function render() {
-  const titles = {
-    dashboard: ["OVERVIEW", "Dashboard"],
-    subjects: ["ACADEMICS", "Subjects"],
-    assignments: ["PRODUCTIVITY", "Assignments"],
-    exams: ["ACADEMICS", "Exam Schedule"],
-    timetable: ["SCHEDULE", "Timetable"],
-    notes: ["KNOWLEDGE", "Notes"],
-    attendance: ["ANALYTICS", "Attendance"],
-    "attendance-intelligence": ["ANALYTICS", "Attendance Intelligence"],
-    planner: ["SMART TOOLS", "Smart Study Planner"],
-    "exam-prep": ["SMART TOOLS", "Exam Preparation"],
-    notifications: ["ANALYTICS", "Notifications"],
-    goals: ["ANALYTICS", "Goals & Streak"],
-    profile: ["ACCOUNT", "Profile & Security"],
-    admin: ["ADMINISTRATION", "Admin Panel"],
-  };
-  $("pageEyebrow").textContent = titles[state.page][0];
-  $("pageTitle").childNodes[0].nodeValue = titles[state.page][1] + " ";
-
-  document
-    .querySelectorAll(".admin-only")
-    .forEach((el) =>
-      el.classList.toggle("hidden", state.user?.role !== "admin"),
-    );
-  if (state.user?.role !== "admin" && state.page === "admin")
-    state.page = "dashboard";
-
-  $("pageContent").innerHTML = views[state.page]();
-  bindPage();
-}
-
+// FIXED: Moved views object ABOVE the render function
 const views = {
   dashboard() {
     const d = state.data;
@@ -477,6 +472,46 @@ const views = {
   },
 };
 
+function render() {
+  const titles = {
+    dashboard: ["OVERVIEW", "Dashboard"],
+    subjects: ["ACADEMICS", "Subjects"],
+    assignments: ["PRODUCTIVITY", "Assignments"],
+    exams: ["ACADEMICS", "Exam Schedule"],
+    timetable: ["SCHEDULE", "Timetable"],
+    notes: ["KNOWLEDGE", "Notes"],
+    attendance: ["ANALYTICS", "Attendance"],
+    "attendance-intelligence": ["ANALYTICS", "Attendance Intelligence"],
+    planner: ["SMART TOOLS", "Smart Study Planner"],
+    "exam-prep": ["SMART TOOLS", "Exam Preparation"],
+    notifications: ["ANALYTICS", "Notifications"],
+    goals: ["ANALYTICS", "Goals & Streak"],
+    profile: ["ACCOUNT", "Profile & Security"],
+    admin: ["ADMINISTRATION", "Admin Panel"],
+  };
+
+  const pageEyebrow = $("pageEyebrow");
+  const pageTitle = $("pageTitle");
+  const pageContent = $("pageContent");
+
+  if (pageEyebrow) pageEyebrow.textContent = titles[state.page][0];
+  if (pageTitle && pageTitle.childNodes[0])
+    pageTitle.childNodes[0].nodeValue = titles[state.page][1] + " ";
+
+  document
+    .querySelectorAll(".admin-only")
+    .forEach((el) =>
+      el.classList.toggle("hidden", state.user?.role !== "admin"),
+    );
+  if (state.user?.role !== "admin" && state.page === "admin")
+    state.page = "dashboard";
+
+  if (pageContent) {
+    pageContent.innerHTML = views[state.page]();
+    bindPage();
+  }
+}
+
 function bindPage() {
   document.querySelectorAll("[data-admin-tab]").forEach((b) => {
     b.onclick = () => {
@@ -512,53 +547,44 @@ function updateFocusDisplay() {
     .toString()
     .padStart(2, "0");
   const s = (focusSeconds % 60).toString().padStart(2, "0");
-  $("focusDisplay").textContent = `${m}:${s}`;
+  const focusDisplay = $("focusDisplay");
+  if (focusDisplay) focusDisplay.textContent = `${m}:${s}`;
 }
 
-$("startFocusBtn").onclick = () => {
-  if (focusInterval) {
+const startFocusBtn = $("startFocusBtn");
+if (startFocusBtn) {
+  startFocusBtn.onclick = () => {
+    if (focusInterval) {
+      clearInterval(focusInterval);
+      focusInterval = null;
+      startFocusBtn.textContent = "Start focus";
+    } else {
+      startFocusBtn.textContent = "Pause focus";
+      focusInterval = setInterval(() => {
+        if (focusSeconds > 0) {
+          focusSeconds--;
+          updateFocusDisplay();
+        } else {
+          clearInterval(focusInterval);
+          focusInterval = null;
+          toast("Focus session complete!");
+          startFocusBtn.textContent = "Start focus";
+        }
+      }, 1000);
+    }
+  };
+}
+
+const resetFocusBtn = $("resetFocusBtn");
+if (resetFocusBtn) {
+  resetFocusBtn.onclick = () => {
     clearInterval(focusInterval);
     focusInterval = null;
-    $("startFocusBtn").textContent = "Start focus";
-  } else {
-    $("startFocusBtn").textContent = "Pause focus";
-    focusInterval = setInterval(() => {
-      if (focusSeconds > 0) {
-        focusSeconds--;
-        updateFocusDisplay();
-      } else {
-        clearInterval(focusInterval);
-        focusInterval = null;
-        toast("Focus session complete!");
-        $("startFocusBtn").textContent = "Start focus";
-      }
-    }, 1000);
-  }
-};
-
-$("resetFocusBtn").onclick = () => {
-  clearInterval(focusInterval);
-  focusInterval = null;
-  const activePreset = document.querySelector(".preset-btn.active");
-  focusSeconds = (activePreset ? Number(activePreset.dataset.time) : 25) * 60;
-  updateFocusDisplay();
-  $("startFocusBtn").textContent = "Start focus";
-};
+    const activePreset = document.querySelector(".preset-btn.active");
+    focusSeconds = (activePreset ? Number(activePreset.dataset.time) : 25) * 60;
+    updateFocusDisplay();
+    if (startFocusBtn) startFocusBtn.textContent = "Start focus";
+  };
+}
 
 if (state.token) startApp();
-
-async function startApp() {
-  try {
-    state.user = await api("/api/me");
-    state.data = await api("/api/data");
-    if (state.user.role === "admin") await loadAdmin();
-    authView.classList.add("hidden");
-    appView.classList.remove("hidden");
-    $("avatar").textContent = (state.user.name || "P")[0].toUpperCase();
-    render();
-  } catch (err) {
-    console.error("StartApp failed:", err); // ADD THIS LINE
-    toast("Error loading user data. Check console."); // ADD THIS LINE
-    logout(false);
-  }
-}
